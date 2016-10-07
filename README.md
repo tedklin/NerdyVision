@@ -4,7 +4,8 @@
 tedfoodlin
 
 
-##FRC 2016 Vision testing
+
+##FRC 2016 Vision testing using OpenCV Python
 
 1. Gets frame from camera
 
