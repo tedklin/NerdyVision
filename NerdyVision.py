@@ -60,9 +60,9 @@ while(True):
             # to try to get the centroid as close as possible to the center of the frame
             else:
                 if cx > frameCenterX:
-                    print("Turn Left")
-                elif cx < frameCenterX:
                     print("Turn Right")
+                elif cx < frameCenterX:
+                    print("Turn Left")
 
                 if cy > frameCenterY:
                     print("Aim Higher")
