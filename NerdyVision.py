@@ -31,8 +31,6 @@ while(True):
     #mask = cv2.erode(mask, None, iterations=2)
     #mask = cv2.dilate(mask, None, iterations=2)
     res = cv2.bitwise_and(frame,frame,mask=mask)
-    cv2.imshow("orig",frame)
-    cv2.imshow("iso",res)
 
     # using contours to find the centroid of the green object (goal)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
@@ -42,14 +40,21 @@ while(True):
     if len(cnts) > 0:
         # find the largest contour (closest goal) in the mask
         c = max(cnts, key=cv2.contourArea)
-
+        # draw a rectangle around it
+        rect = cv2.minAreaRect(c)
+        box = cv2.boxPoints(rect)
+        box = np.int0(box)
+        cv2.drawContours(res, [box], 0, (0, 0, 255), 2)
         # calculate centroid
         M = cv2.moments(c)
         if M['m00']>0:
+            # draw and print center
             cx = int(M['m10'] / M['m00'])
             cy = int(M['m01'] / M['m00'])
             center = (cx, cy)
 
+
+            cv2.circle(res, center, 5, (0, 0, 255), -1)
             print(center)
 
             # if the centroid of the green object is within the tolerance zone of the center of the frame
@@ -68,6 +73,9 @@ while(True):
                     print("Aim Higher")
                 elif cy < frameCenterY:
                     print("Aim Lower")
+
+        cv2.imshow("orig", frame)
+        cv2.imshow("res", res)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
