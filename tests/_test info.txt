@@ -1,1 +1,3 @@
 Temporary tests made using a mechanical pencil with a green grip.
+
+Commands based on perspective of robot.
