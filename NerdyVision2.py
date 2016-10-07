@@ -74,9 +74,9 @@ while(True):
                     print("Turn Left")
 
                 if cy > frameCenterY:
-                    print("Aim Higher")
-                elif cy < frameCenterY:
                     print("Aim Lower")
+                elif cy < frameCenterY:
+                    print("Aim Higher")
 
         cv2.imshow("res", res)
 
