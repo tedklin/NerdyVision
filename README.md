@@ -18,3 +18,10 @@ tedfoodlin
 5. If the centroid of the object is already within the small specified tolerance zone around the center of the camera, outputs "ready to shoot" (assuming that the camera is at the center of the shooter, otherwise, adjust the frameCenterX and frameCenterY according to position of camera relative to the shooter)
 
 6. Otherwise, outputs how to move in order to get the centroid of the object as close as possible to the center of the camara 
+
+###Nerdy Vision
+Contour with rectangle
+
+###Nerdy Vision 2
+Contour with circle
+
