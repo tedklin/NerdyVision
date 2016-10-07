@@ -33,6 +33,9 @@ while(True):
     mask = cv2.dilate(mask, None, iterations=2)
     res = cv2.bitwise_and(frame,frame,mask=mask)
 
+    # draw center of camera
+    cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
+
     # using contours to find the centroid of the green object (goal)
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                             cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -53,7 +56,6 @@ while(True):
             cx = int(M['m10'] / M['m00'])
             cy = int(M['m01'] / M['m00'])
             center = (cx, cy)
-
 
             cv2.circle(res, center, 5, (0, 0, 255), -1)
             print(center)
