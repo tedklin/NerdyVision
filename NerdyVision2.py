@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses a parallelogram contour
+# Uses a circle contour
 
 import cv2
 import numpy as np
@@ -42,21 +42,21 @@ while(True):
         # find the largest contour (closest goal) in the mask
         c = max(cnts, key=cv2.contourArea)
         # draw a rectangle around it
-        rect = cv2.minAreaRect(c)
-        box = cv2.boxPoints(rect)
-        box = np.int0(box)
-        cv2.drawContours(res, [box], 0, (0, 0, 255), 2)
-        # calculate centroid
+        c = max(cnts, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        #calculate center
         M = cv2.moments(c)
         if M['m00']>0:
-            # draw and print center
-            cx = int(M['m10'] / M['m00'])
-            cy = int(M['m01'] / M['m00'])
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
             center = (cx, cy)
+            print center
 
-
-            cv2.circle(res, center, 5, (0, 0, 255), -1)
-            print(center)
+            # only proceed if the radius meets a minimum size
+            if radius > 10:
+                # draw the circle and its center on frame
+                cv2.circle(res, (int(x), int(y)), int(radius), (0, 0, 255), 2)
+                cv2.circle(res, center, 5, (0, 0, 255), -1)
 
             # if the centroid of the green object is within the tolerance zone of the center of the frame
             # it is ready to shoot
