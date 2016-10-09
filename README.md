@@ -20,8 +20,14 @@ tedfoodlin
 6. Otherwise, outputs how to move in order to get the centroid of the object as close as possible to the center of the camara 
 
 ###Nerdy Vision
-Contour with rectangle
+Rectangle contour
 
 ###Nerdy Vision 2
-Contour with circle
+Circle contour
+
+###Nerdy Vision 3
+Contour with hull
+
+###Nerdy Vision 4
+Approximate polygon contour
 
