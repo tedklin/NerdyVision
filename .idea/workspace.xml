@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f0118398-8639-4e31-b253-429dc3ffc8bd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision.py" afterPath="$PROJECT_DIR$/NerdyVision.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision2.py" afterPath="$PROJECT_DIR$/NerdyVision2.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/NerdyVision3.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="NerdyVision.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,13 +23,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="NerdyVision.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NerdyVision.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NerdyVision.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="496">
-              <caret line="77" column="37" selection-start-line="77" selection-start-column="37" selection-end-line="77" selection-end-column="37" />
+            <state relative-caret-position="661">
+              <caret line="84" column="23" selection-start-line="0" selection-start-column="0" selection-end-line="84" selection-end-column="23" />
               <folding>
                 <element signature="e#86#96#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NerdyVision3.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/NerdyVision3.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="765">
+              <caret line="51" column="22" selection-start-line="51" selection-start-column="22" selection-end-line="51" selection-end-column="22" />
+              <folding>
+                <element signature="e#74#84#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -60,8 +72,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/NerdyVision.py" />
         <option value="$PROJECT_DIR$/NerdyVision2.py" />
+        <option value="$PROJECT_DIR$/NerdyVision.py" />
+        <option value="$PROJECT_DIR$/NerdyVision3.py" />
       </list>
     </option>
   </component>
@@ -329,10 +342,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/NerdyVision.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="77" column="37" selection-start-line="77" selection-start-column="37" selection-end-line="77" selection-end-column="37" />
+        <state relative-caret-position="661">
+          <caret line="84" column="23" selection-start-line="0" selection-start-column="0" selection-end-line="84" selection-end-column="23" />
           <folding>
             <element signature="e#86#96#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NerdyVision3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="51" column="22" selection-start-line="51" selection-start-column="22" selection-end-line="51" selection-end-column="22" />
+          <folding>
+            <element signature="e#74#84#0" expanded="true" />
           </folding>
         </state>
       </provider>
