@@ -26,8 +26,11 @@ Rectangle contour
 Circle contour
 
 ###Nerdy Vision 3
-Contour with hull
+Convex hull
 
 ###Nerdy Vision 4
-Approximate polygon contour
+Contour approximation
+
+###Nerdy Vision 5
+Convex hull then contour approximation
 
