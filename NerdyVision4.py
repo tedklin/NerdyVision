@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses contour with convex hull
+# Uses an approximate polygon contour
 
 import cv2
 import numpy as np
@@ -44,11 +44,11 @@ while(True):
     if len(cnts) > 0:
         # find the largest contour (closest goal) in the mask
         c = max(cnts, key=cv2.contourArea)
-        hull = cv2.convexHull(c)
-        # draw the contour
-        cv2.drawContours(res, [hull], 0, (0, 0, 255), 2)
+        epsilon = 0.03 * cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, epsilon, True)
+        cv2.drawContours(res, [approx], 0, (0, 0, 255), 2)
         # calculate centroid
-        M = cv2.moments(hull)
+        M = cv2.moments(approx)
         if M['m00']>0:
             # draw and print center
             cx = int(M['m10'] / M['m00'])
