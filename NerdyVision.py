@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses a parallelogram contour
+# Uses a rectangle contour
 
 import cv2
 import numpy as np

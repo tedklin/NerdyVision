@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses contour with convex hull
+# Convex hull
 
 import cv2
 import numpy as np

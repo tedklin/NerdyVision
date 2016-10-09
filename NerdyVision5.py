@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Hull then approximate polygon
+# Convex hull then contour approximation
 
 import cv2
 import numpy as np

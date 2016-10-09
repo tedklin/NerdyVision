@@ -1,6 +1,6 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses an approximate polygon contour
+# Contour approximation
 
 import cv2
 import numpy as np
