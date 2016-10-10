@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f0118398-8639-4e31-b253-429dc3ffc8bd" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision.py" afterPath="$PROJECT_DIR$/NerdyVision.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision2.py" afterPath="$PROJECT_DIR$/NerdyVision2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision3.py" afterPath="$PROJECT_DIR$/NerdyVision3.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision4.py" afterPath="$PROJECT_DIR$/NerdyVision4.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NerdyVision5.py" afterPath="$PROJECT_DIR$/NerdyVision5.py" />
@@ -28,8 +30,8 @@
       <file leaf-file-name="NerdyVision.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NerdyVision.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+            <state relative-caret-position="599">
+              <caret line="78" column="42" selection-start-line="78" selection-start-column="42" selection-end-line="78" selection-end-column="42" />
               <folding>
                 <element signature="e#82#92#0" expanded="true" />
               </folding>
@@ -37,11 +39,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="NerdyVision2.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/NerdyVision2.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="NerdyVision3.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NerdyVision3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            <state relative-caret-position="435">
+              <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="48" selection-end-column="23" />
               <folding>
                 <element signature="e#69#79#0" expanded="true" />
               </folding>
@@ -52,8 +64,8 @@
       <file leaf-file-name="NerdyVision4.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NerdyVision4.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
+            <state relative-caret-position="599">
+              <caret line="71" column="28" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="28" />
               <folding>
                 <element signature="e#79#89#0" expanded="true" />
               </folding>
@@ -61,24 +73,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NerdyVision5.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NerdyVision5.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NerdyVision5.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="40" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="40" />
+            <state relative-caret-position="269">
+              <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="48" selection-end-column="23" />
               <folding>
                 <element signature="e#96#106#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NerdyVision2.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NerdyVision2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="496">
-              <caret line="78" column="37" selection-start-line="78" selection-start-column="37" selection-end-line="78" selection-end-column="37" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -98,19 +100,19 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/NerdyVision2.py" />
+        <option value="$PROJECT_DIR$/NerdyVision5.py" />
+        <option value="$PROJECT_DIR$/NerdyVision4.py" />
         <option value="$PROJECT_DIR$/NerdyVision.py" />
         <option value="$PROJECT_DIR$/NerdyVision3.py" />
-        <option value="$PROJECT_DIR$/NerdyVision4.py" />
-        <option value="$PROJECT_DIR$/NerdyVision5.py" />
+        <option value="$PROJECT_DIR$/NerdyVision2.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="16" />
     <option name="y" value="23" />
-    <option name="width" value="910" />
-    <option name="height" value="802" />
+    <option name="width" value="965" />
+    <option name="height" value="875" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -314,10 +316,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="16" y="23" width="910" height="802" extended-state="0" />
+    <frame x="16" y="23" width="965" height="875" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24945055" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23523316" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -348,7 +350,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -360,51 +364,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NerdyVision2.py">
+    <entry file="file://$PROJECT_DIR$/NerdyVision5.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="78" column="37" selection-start-line="78" selection-start-column="37" selection-end-line="78" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NerdyVision.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+        <state relative-caret-position="269">
+          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="48" selection-end-column="23" />
           <folding>
-            <element signature="e#82#92#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NerdyVision3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-          <folding>
-            <element signature="e#69#79#0" expanded="true" />
+            <element signature="e#96#106#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/NerdyVision4.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
+        <state relative-caret-position="599">
+          <caret line="71" column="28" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="28" />
           <folding>
             <element signature="e#79#89#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NerdyVision5.py">
+    <entry file="file://$PROJECT_DIR$/NerdyVision3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="40" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="40" />
+        <state relative-caret-position="435">
+          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="48" selection-end-column="23" />
           <folding>
-            <element signature="e#96#106#0" expanded="true" />
+            <element signature="e#69#79#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NerdyVision.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="599">
+          <caret line="78" column="42" selection-start-line="78" selection-start-column="42" selection-end-line="78" selection-end-column="42" />
+          <folding>
+            <element signature="e#82#92#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NerdyVision2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

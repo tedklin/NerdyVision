@@ -44,38 +44,41 @@ while(True):
     if len(cnts) > 0:
         # find the largest contour (closest goal) in the mask
         c = max(cnts, key=cv2.contourArea)
-        hull = cv2.convexHull(c)
-        # draw the contour
-        epsilon = 0.03 * cv2.arcLength(hull, True)
-        approx = cv2.approxPolyDP(hull, epsilon, True)
-        cv2.drawContours(res, [approx], 0, (0, 0, 255), 2)
-        # calculate centroid
-        M = cv2.moments(approx)
-        if M['m00']>0:
-            # draw and print center
-            cx = int(M['m10'] / M['m00'])
-            cy = int(M['m01'] / M['m00'])
-            center = (cx, cy)
+        # make sure the largest contour is large enough to be significant
+        area = cv2.contourArea(c)
+        if area > 2000:
+            hull = cv2.convexHull(c)
+            # draw the contour
+            epsilon = 0.03 * cv2.arcLength(hull, True)
+            approx = cv2.approxPolyDP(hull, epsilon, True)
+            cv2.drawContours(res, [approx], 0, (0, 0, 255), 2)
+            # calculate centroid
+            M = cv2.moments(approx)
+            if M['m00']>0:
+                # draw and print center
+                cx = int(M['m10'] / M['m00'])
+                cy = int(M['m01'] / M['m00'])
+                center = (cx, cy)
 
-            cv2.circle(res, center, 5, (0, 0, 255), -1)
-            print(center)
+                cv2.circle(res, center, 5, (0, 0, 255), -1)
+                print(center)
 
-            # if the centroid of the green object is within the tolerance zone of the center of the frame
-            # it is ready to shoot
-            if cx < (frameCenterX+10) and cx > (frameCenterX-10) and cy < (frameCenterY+10) and cy > (frameCenterY-10):
-                print("Ready to shoot")
-            # otherwise, tell robot to turn left or right and aim the shooter higher or lower
-            # to try to get the centroid as close as possible to the center of the frame
-            else:
-                if cx > frameCenterX:
-                    print("Turn Right")
-                elif cx < frameCenterX:
-                    print("Turn Left")
+                # if the centroid of the green object is within the tolerance zone of the center of the frame
+                # it is ready to shoot
+                if cx < (frameCenterX+10) and cx > (frameCenterX-10) and cy < (frameCenterY+10) and cy > (frameCenterY-10):
+                    print("Ready to shoot")
+                # otherwise, tell robot to turn left or right and aim the shooter higher or lower
+                # to try to get the centroid as close as possible to the center of the frame
+                else:
+                    if cx > frameCenterX:
+                        print("Turn Right")
+                    elif cx < frameCenterX:
+                        print("Turn Left")
 
-                if cy > frameCenterY:
-                    print("Aim Lower")
-                elif cy < frameCenterY:
-                    print("Aim Higher")
+                    if cy > frameCenterY:
+                        print("Aim Lower")
+                    elif cy < frameCenterY:
+                        print("Aim Higher")
 
         cv2.imshow("res", res)
 
