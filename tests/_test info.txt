@@ -1,3 +1,5 @@
-Temporary tests made using a mechanical pencil with a green grip which represents the high goal.
+Temporary tests for HSV value made using a mechanical pencil with a green grip which represents the high goal.
+
+Temporary tests for contour detection made using a drawing using a pink highlighter that represents the high goal.
 
 Commands based on perspective of camera of the robot.
