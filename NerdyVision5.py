@@ -18,6 +18,8 @@ cap = cv2.VideoCapture(0)
 # lower and upper limits for the green we are looking for
 lower_green = np.array([29, 86, 6])
 upper_green = np.array([64, 255, 255])
+
+#temporary test color
 lower_pink = np.array([140, 20, 20])
 upper_pink = np.array([180, 255, 255])
 
@@ -30,7 +32,7 @@ while(True):
 
     # remove everything but specified color (green)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_pink, upper_pink)
+    mask = cv2.inRange(hsv, lower_green, upper_green)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
     res = cv2.bitwise_and(frame,frame,mask=mask)
