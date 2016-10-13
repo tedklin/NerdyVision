@@ -1,9 +1,8 @@
 # NerdyVision
+# Final code: NerdyVision5
 
 ##Author 
 tedfoodlin
-
-
 
 ##FRC 2016 Vision testing using OpenCV Python
 
