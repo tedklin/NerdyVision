@@ -8,81 +8,116 @@ import sys
 
 # for use with OSX
 sys.path.append('/usr/local/lib/python2.7/site-packages')
-i = 1
-j = 1
-s = 0
 
+
+# ---------------- CONSTANTS --------------- #
 # capture video from camera
 cap = cv2.VideoCapture(0)
 
-# lower and upper limits for the green we are looking for
-lower_green = np.array([29, 86, 6])
-upper_green = np.array([64, 255, 255])
+# lower and upper limits for the green we are looking for (untuned)
+lower_green = np.array([30, 20, 10])
+upper_green = np.array([70, 255, 255])
 
-#temporary test color
-lower_pink = np.array([140, 20, 20])
-upper_pink = np.array([180, 255, 255])
+# temporary test color (pink highlighter)
+lower_pink = np.array([150, 60, 60])
+upper_pink = np.array([170, 255, 255])
 
 # center of the frame on a mac
 frameCenterY = 716/2
 frameCenterX = 1278/2
+# ------------------------------------------- #
 
+
+# ---------------- FUNCTIONS ---------------- #
+# removes everything but specified color
+def masking(lower, upper):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, lower, upper)
+    res = cv2.bitwise_and(frame,frame,mask=mask)
+    return res, mask
+
+# turns a contour into a polygon
+def polygon(c):
+    hull = cv2.convexHull(c)
+    epsilon = 0.025 * cv2.arcLength(hull, True)
+    goal = cv2.approxPolyDP(hull, epsilon, True)
+    return goal
+
+# detect center
+def calc_center(M):
+    cx = int(M['m10'] / M['m00'])
+    cy = int(M['m01'] / M['m00'])
+    return cx, cy
+# ------------------------------------------- #
+
+
+# iterative tracking
 while(True):
     ret, frame = cap.read()
 
-    # remove everything but specified color (green)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_green, upper_green)
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
-    res = cv2.bitwise_and(frame,frame,mask=mask)
+    # remove everything but specified color
+    res, mask = masking(lower_pink, upper_pink)
 
     # draw center of camera
     cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
+    # draw line for x position (we have set shooting angles for y)
+    cv2.line(res, (frameCenterX, 0), (frameCenterX, frameCenterY * 2), (0, 0, 255), 2)
 
-    # using contours to find the centroid of the green object (goal)
+    # find contour of goal
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                             cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
+
     # only proceed if at least one contour was found
     if len(cnts) > 0:
         # find the largest contour (closest goal) in the mask
         c = max(cnts, key=cv2.contourArea)
+
         # make sure the largest contour is large enough to be significant
         area = cv2.contourArea(c)
-        if area > 2000:
-            hull = cv2.convexHull(c)
-            # draw the contour
-            epsilon = 0.03 * cv2.arcLength(hull, True)
-            approx = cv2.approxPolyDP(hull, epsilon, True)
-            cv2.drawContours(res, [approx], 0, (0, 0, 255), 2)
-            # calculate centroid
-            M = cv2.moments(approx)
-            if M['m00']>0:
-                # draw and print center
-                cx = int(M['m10'] / M['m00'])
-                cy = int(M['m01'] / M['m00'])
-                center = (cx, cy)
+        if area > 1500:
+            # make suggested contour into a polygon
+            goal = polygon(c)
 
-                cv2.circle(res, center, 5, (0, 0, 255), -1)
-                print(center)
+            # make sure goal contour has 4 sides
+            if len(goal) == 4:
+                # draw the contour
+                cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                # if the centroid of the green object is within the tolerance zone of the center of the frame
-                # it is ready to shoot
-                if cx < (frameCenterX+10) and cx > (frameCenterX-10) and cy < (frameCenterY+10) and cy > (frameCenterY-10):
-                    print("Ready to shoot")
-                # otherwise, tell robot to turn left or right and aim the shooter higher or lower
-                # to try to get the centroid as close as possible to the center of the frame
-                else:
-                    if cx > frameCenterX:
-                        print("Turn Right")
-                    elif cx < frameCenterX:
-                        print("Turn Left")
+                # calculate centroid
+                M = cv2.moments(goal)
+                if M['m00'] > 0:
+                    cx, cy = calc_center(M)
+                    center = (cx, cy)
 
-                    if cy > frameCenterY:
-                        print("Aim Lower")
-                    elif cy < frameCenterY:
-                        print("Aim Higher")
+                    # draw and print center
+                    cv2.circle(res, center, 5, (255, 0, 0), -1)
+                    print(center)
+
+                    # if it is aligned with the center y-axis
+                    # it is ready to shoot
+                    if cx < (frameCenterX+10) and cx > (frameCenterX-10):
+                        print("X Aligned")
+                    # otherwise, tell robot to turn left or right to align with goal
+                    else:
+                        if cx > frameCenterX:
+                            print("Turn Right")
+                        elif cx < frameCenterX:
+                            print("Turn Left")
+
+                    if cy < (frameCenterY+10) and cy > (frameCenterY-10):
+                        print("Y Aligned")
+                    # if it is aligned with the center x-axis
+                    # that's good, but we don't need that (unless ur 987) lol
+                    else:
+                        if cy > frameCenterY:
+                            print("Aim Lower")
+                        elif cy < frameCenterY:
+                            print("Aim Higher")
+            else:
+                print("Goal contour not found")
+        else:
+            print("Goal contour not found")
 
         cv2.imshow("res", res)
 
