@@ -6,25 +6,27 @@ import cv2
 import numpy as np
 import sys
 
-# for use with OSX
+# for use with OSX and virtualenv
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 
-
-# ---------------- CONSTANTS --------------- #
 # capture video from camera
 cap = cv2.VideoCapture(0)
 
-# lower and upper limits for the green we are looking for (untuned)
+# ---------------- CONSTANTS ---------------- #
+# HSV lower and upper limits for the green we are looking for (untuned)
 lower_green = np.array([30, 20, 10])
 upper_green = np.array([70, 255, 255])
 
-# temporary test color (pink highlighter)
+# HSV temporary test color (pink highlighter)
 lower_pink = np.array([150, 60, 60])
 upper_pink = np.array([170, 255, 255])
 
-# center of the frame on a mac
-frameCenterY = 716/2
-frameCenterX = 1278/2
+# frame dimensions
+y = 716
+x = 1278
+# center of the frame
+frameCenterY = y/2
+frameCenterX = x/2
 # ------------------------------------------- #
 
 
@@ -61,7 +63,7 @@ while(True):
     # draw center of camera
     cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
     # draw line for x position (we have set shooting angles for y)
-    cv2.line(res, (frameCenterX, 0), (frameCenterX, frameCenterY * 2), (0, 0, 255), 2)
+    cv2.line(res, (frameCenterX, 0), (frameCenterX, y), (0, 0, 255), 2)
 
     # find contour of goal
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
@@ -119,9 +121,10 @@ while(True):
         else:
             print("Goal contour not found")
 
-        cv2.imshow("res", res)
+    cv2.imshow("res", res)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 cap.release()
 cv2.destroyAllWindows()
