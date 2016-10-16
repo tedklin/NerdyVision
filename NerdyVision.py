@@ -12,9 +12,10 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 # capture video from camera
 cap = cv2.VideoCapture(0)
 
+
 # ---------------- CONSTANTS ---------------- #
 # HSV lower and upper limits for the green we are looking for (untuned)
-lower_green = np.array([30, 20, 10])
+lower_green = np.array([50, 20, 20])
 upper_green = np.array([70, 255, 255])
 
 # HSV temporary test color (pink highlighter)
@@ -25,8 +26,8 @@ upper_pink = np.array([170, 255, 255])
 y = 716
 x = 1278
 # center of the frame
-frameCenterY = y/2
-frameCenterX = x/2
+frameCenterY = y / 2
+frameCenterX = x / 2
 # ------------------------------------------- #
 
 
@@ -38,18 +39,21 @@ def masking(lower, upper, frame):
     res = cv2.bitwise_and(frame, frame, mask=mask)
     return res, mask
 
+
 # turns a contour into a polygon
-def polygon(c): 
+def polygon(c):
     hull = cv2.convexHull(c)
     epsilon = 0.025 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
+
 
 # detect center
 def calc_center(M):
     cx = int(M['m10'] / M['m00'])
     cy = int(M['m01'] / M['m00'])
     return cx, cy
+
 
 # report commands to robot on terminal
 def report_command(cx):
@@ -63,6 +67,7 @@ def report_command(cx):
             print("Turn Right")
         elif cx < frameCenterX:
             print("Turn Left")
+
 
 # report state of y
 def report_y(cy):
@@ -87,7 +92,7 @@ def main():
         ret, frame = cap.read()
 
         # remove everything but specified color
-        res, mask = masking(lower_pink, upper_pink, frame)
+        res, mask = masking(lower_green, upper_green, frame)
 
         # draw center of camera
         cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
@@ -125,9 +130,12 @@ def main():
                         cv2.circle(res, center, 5, (255, 0, 0), -1)
                         print(center)
 
+                        # define ranges of tolerance
+                        upper_range = frameCenterX + 10
+                        lower_range = frameCenterX - 10
                         # if it is aligned with the center y-axis
                         # it is ready to shoot
-                        if cx < (frameCenterX+10) and cx > (frameCenterX-10):
+                        if cx < (upper_range) and cx > (lower_range):
                             ready = True
                         # otherwise, tell robot to turn left or right to align
                         else:
@@ -156,6 +164,7 @@ def main():
 
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()
