@@ -139,9 +139,9 @@ def main():
                             ready = True
                         # otherwise, tell robot to turn left or right to align
                         else:
-                            if cx > frameCenterX:
+                            if cx > upper_range:
                                 turnRight = True
-                            elif cx < frameCenterX:
+                            elif cx < lower_range:
                                 turnLeft = True
 
                         # report the commands given to robot on terminal
