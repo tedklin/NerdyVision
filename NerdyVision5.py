@@ -50,12 +50,41 @@ def calc_center(M):
     cx = int(M['m10'] / M['m00'])
     cy = int(M['m01'] / M['m00'])
     return cx, cy
+
+# report commands to robot on terminal
+def report_command(cx):
+    # if it is aligned with the center y-axis
+    # it is ready to shoot
+    if cx < (frameCenterX + 10) and cx > (frameCenterX - 10):
+        print("X Aligned")
+    # otherwise, tell robot to turn left or right to align with goal
+    else:
+        if cx > frameCenterX:
+            print("Turn Right")
+        elif cx < frameCenterX:
+            print("Turn Left")
+
+# report state of y
+def report_y(cy):
+    if cy < (frameCenterY + 10) and cy > (frameCenterY - 10):
+        print("Y Aligned")
+    else:
+        if cy > frameCenterY:
+            print("Aim Lower")
+        elif cy < frameCenterY:
+            print("Aim Higher")
 # ------------------------------------------- #
 
 
 def main():
+
     # iterative tracking
     while 687:
+        # init states (for x only)
+        turnRight = False
+        turnLeft = False
+        ready = False
+
         ret, frame = cap.read()
 
         # remove everything but specified color
@@ -100,23 +129,18 @@ def main():
                         # if it is aligned with the center y-axis
                         # it is ready to shoot
                         if cx < (frameCenterX+10) and cx > (frameCenterX-10):
-                            print("X Aligned")
+                            ready = True
                         # otherwise, tell robot to turn left or right to align with goal
                         else:
                             if cx > frameCenterX:
-                                print("Turn Right")
+                                turnRight = True
                             elif cx < frameCenterX:
-                                print("Turn Left")
+                                turnLeft = True
 
-                        # if it is aligned with the center x-axis
-                        # that's good, but we don't need that (unless ur 987) lol
-                        if cy < (frameCenterY+10) and cy > (frameCenterY-10):
-                            print("Y Aligned")
-                        else:
-                            if cy > frameCenterY:
-                                print("Aim Lower")
-                            elif cy < frameCenterY:
-                                print("Aim Higher")
+                        # report the commands given to robot on terminal (testing)
+                        report_command(cx)
+                        # report state of y (useful but not necessary)
+                        report_y(cy)
                 else:
                     print("Goal contour not found")
             else:
