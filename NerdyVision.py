@@ -1,88 +1,162 @@
 # author: tedfoodlin
 # FRC Vision testing with OpenCV
-# Uses a rectangle contour
+# Convex hull then contour approximation
 
 import cv2
 import numpy as np
 import sys
 
-# for use with OSX
+# for use with OSX and virtualenv
 sys.path.append('/usr/local/lib/python2.7/site-packages')
-i = 1
-j = 1
-s = 0
 
 # capture video from camera
 cap = cv2.VideoCapture(0)
 
-# lower and upper limits for the green we are looking for
-lower_green = np.array([29, 86, 6])
-upper_green = np.array([64, 255, 255])
+# ---------------- CONSTANTS ---------------- #
+# HSV lower and upper limits for the green we are looking for (untuned)
+lower_green = np.array([30, 20, 10])
+upper_green = np.array([70, 255, 255])
 
-# center of the frame on a mac
-frameCenterY = 716/2
-frameCenterX = 1278/2
+# HSV temporary test color (pink highlighter)
+lower_pink = np.array([150, 60, 60])
+upper_pink = np.array([170, 255, 255])
 
-while(True):
-    ret, frame = cap.read()
+# frame dimensions
+y = 716
+x = 1278
+# center of the frame
+frameCenterY = y/2
+frameCenterX = x/2
+# ------------------------------------------- #
 
-    # remove everything but specified color (green)
+
+# ---------------- FUNCTIONS ---------------- #
+# removes everything but specified color
+def masking(lower, upper, frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_green, upper_green)
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
+    mask = cv2.inRange(hsv, lower, upper)
     res = cv2.bitwise_and(frame,frame,mask=mask)
+    return res, mask
 
-    # draw center of camera
-    cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
+# turns a contour into a polygon
+def polygon(c):
+    hull = cv2.convexHull(c)
+    epsilon = 0.025 * cv2.arcLength(hull, True)
+    goal = cv2.approxPolyDP(hull, epsilon, True)
+    return goal
 
-    # using contours to find the centroid of the green object (goal)
-    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                            cv2.CHAIN_APPROX_SIMPLE)[-2]
-    center = None
-    # only proceed if at least one contour was found
-    if len(cnts) > 0:
-        # find the largest contour (closest goal) in the mask
-        c = max(cnts, key=cv2.contourArea)
-        # make sure the largest contour is large enough to be significant
-        area = cv2.contourArea(c)
-        if area > 2000:
-            # draw a rectangle around it
-            rect = cv2.minAreaRect(c)
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
-            cv2.drawContours(res, [box], 0, (0, 0, 255), 2)
-            # calculate centroid
-            M = cv2.moments(c)
-            if M['m00']>0:
-                # draw and print center
-                cx = int(M['m10'] / M['m00'])
-                cy = int(M['m01'] / M['m00'])
-                center = (cx, cy)
+# detect center
+def calc_center(M):
+    cx = int(M['m10'] / M['m00'])
+    cy = int(M['m01'] / M['m00'])
+    return cx, cy
 
-                cv2.circle(res, center, 5, (0, 0, 255), -1)
-                print(center)
+# report commands to robot on terminal
+def report_command(cx):
+    # if it is aligned with the center y-axis
+    # it is ready to shoot
+    if cx < (frameCenterX + 10) and cx > (frameCenterX - 10):
+        print("X Aligned")
+    # otherwise, tell robot to turn left or right to align with goal
+    else:
+        if cx > frameCenterX:
+            print("Turn Right")
+        elif cx < frameCenterX:
+            print("Turn Left")
 
-                # if the centroid of the green object is within the tolerance zone of the center of the frame
-                # it is ready to shoot
-                if cx < (frameCenterX+10) and cx > (frameCenterX-10) and cy < (frameCenterY+10) and cy > (frameCenterY-10):
-                    print("Ready to shoot")
-                # otherwise, tell robot to turn left or right and aim the shooter higher or lower
-                # to try to get the centroid as close as possible to the center of the frame
+# report state of y
+def report_y(cy):
+    if cy < (frameCenterY + 10) and cy > (frameCenterY - 10):
+        print("Y Aligned")
+    else:
+        if cy > frameCenterY:
+            print("Aim Lower")
+        elif cy < frameCenterY:
+            print("Aim Higher")
+# ------------------------------------------- #
+
+
+def main():
+
+    # iterative tracking
+    while 687:
+        # init states (for x only)
+        turnRight = False
+        turnLeft = False
+        ready = False
+
+        ret, frame = cap.read()
+
+        # remove everything but specified color
+        res, mask = masking(lower_pink, upper_pink, frame)
+
+        # draw center of camera
+        cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
+        # draw line for x position (we have set shooting angles for y)
+        cv2.line(res, (frameCenterX, 0), (frameCenterX, y), (0, 0, 255), 2)
+
+        # find contour of goal
+        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+                                cv2.CHAIN_APPROX_SIMPLE)[-2]
+        center = None
+
+        # only proceed if at least one contour was found
+        if len(cnts) > 0:
+            # find the largest contour (closest goal) in the mask
+            c = max(cnts, key=cv2.contourArea)
+
+            # make sure the largest contour is large enough to be significant
+            area = cv2.contourArea(c)
+            if area > 1500:
+                # make suggested contour into a polygon
+                goal = polygon(c)
+
+                # make sure goal contour has 4 sides
+                if len(goal) == 4:
+                    # draw the contour
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+
+                    # calculate centroid
+                    M = cv2.moments(goal)
+                    if M['m00'] > 0:
+                        cx, cy = calc_center(M)
+                        center = (cx, cy)
+
+                        # draw and print center
+                        cv2.circle(res, center, 5, (255, 0, 0), -1)
+                        print(center)
+
+                        # if it is aligned with the center y-axis
+                        # it is ready to shoot
+                        if cx < (frameCenterX+10) and cx > (frameCenterX-10):
+                            ready = True
+                        # otherwise, tell robot to turn left or right to align with goal
+                        else:
+                            if cx > frameCenterX:
+                                turnRight = True
+                            elif cx < frameCenterX:
+                                turnLeft = True
+
+                        # report the commands given to robot on terminal (testing)
+                        report_command(cx)
+                        # report state of y (useful but not necessary)
+                        report_y(cy)
                 else:
-                    if cx > frameCenterX:
-                        print("Turn Right")
-                    elif cx < frameCenterX:
-                        print("Turn Left")
+                    print("Goal contour not found")
+            else:
+                print("Goal contour not found")
 
-                    if cy > frameCenterY:
-                        print("Aim Lower")
-                    elif cy < frameCenterY:
-                        print("Aim Higher")
+        # show results
+        cv2.imshow("NerdyVision", res)
 
-        cv2.imshow("res", res)
+        # capture a keypress.
+        key = cv2.waitKey(10) & 0xFF
+        # escape key.
+        if key == 27:
+            break
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cap.release()
-cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
