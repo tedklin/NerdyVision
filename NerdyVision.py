@@ -35,11 +35,11 @@ frameCenterX = x/2
 def masking(lower, upper, frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, lower, upper)
-    res = cv2.bitwise_and(frame,frame,mask=mask)
+    res = cv2.bitwise_and(frame, frame, mask=mask)
     return res, mask
 
 # turns a contour into a polygon
-def polygon(c):
+def polygon(c): 
     hull = cv2.convexHull(c)
     epsilon = 0.025 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
@@ -77,7 +77,6 @@ def report_y(cy):
 
 
 def main():
-
     # iterative tracking
     while 687:
         # init states (for x only)
@@ -130,14 +129,14 @@ def main():
                         # it is ready to shoot
                         if cx < (frameCenterX+10) and cx > (frameCenterX-10):
                             ready = True
-                        # otherwise, tell robot to turn left or right to align with goal
+                        # otherwise, tell robot to turn left or right to align
                         else:
                             if cx > frameCenterX:
                                 turnRight = True
                             elif cx < frameCenterX:
                                 turnLeft = True
 
-                        # report the commands given to robot on terminal (testing)
+                        # report the commands given to robot on terminal
                         report_command(cx)
                         # report state of y (useful but not necessary)
                         report_y(cy)
