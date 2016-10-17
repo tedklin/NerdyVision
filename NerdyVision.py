@@ -53,7 +53,10 @@ def calibration_box(img):
     """Return HSV color in the calibration box"""
     cv2.rectangle(img, CAL_UL, CAL_LR, (0, 255, 0), thickness=1)
     roi = img[CAL_LO:CAL_UP, CAL_R:CAL_L]
-    hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    average_color_per_row = np.average(roi, axis=0)
+    average_color = np.average(average_color_per_row, axis=0)
+    average_color = np.uint8([[average_color]])
+    hsv = cv2.cvtColor(average_color, cv2.COLOR_BGR2HSV)
     return hsv
 
 
