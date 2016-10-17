@@ -91,9 +91,11 @@ def main():
         res, mask = masking(LOWER_GREEN, UPPER_GREEN, frame)
 
         # draw center of camera
-        cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
+        cv2.circle(res, (FRAME_CENTER_X, FRAME_CENTER_Y), 5,
+                   (0, 0, 255), -1)
         # draw line for x position (we have set shooting angles for y)
-        cv2.line(res, (frameCenterX, 0), (frameCenterX, y), (0, 0, 255), 2)
+        cv2.line(res, (FRAME_CENTER_X, 0), (FRAME_CENTER_X, FRAME_Y),
+                 (0, 0, 255), 2)
 
         # find contour of goal
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
@@ -126,18 +128,16 @@ def main():
                         cv2.circle(res, center, 5, (255, 0, 0), -1)
                         print(center)
 
-                        # define ranges of tolerance
-                        upper_range = frameCenterX + 10
-                        lower_range = frameCenterX - 10
                         # if it is aligned with the center y-axis
                         # it is ready to shoot
-                        if cx < (upper_range) and cx > (lower_range):
+                        if (cx < FRAME_CENTER_X + 10 and
+                                cx > FRAME_CENTER_X - 10):
                             ready = True
                         # otherwise, tell robot to turn left or right to align
                         else:
-                            if cx > upper_range:
+                            if cx > FRAME_CENTER_X + 10:
                                 turnRight = True
-                            elif cx < lower_range:
+                            elif cx < FRAME_CENTER_X - 10:
                                 turnLeft = True
 
                         # report the commands given to robot on terminal
