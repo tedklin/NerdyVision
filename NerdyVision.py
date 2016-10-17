@@ -1,82 +1,78 @@
-# author: tedfoodlin
-# FRC Vision testing with OpenCV
-# Convex hull then contour approximation
-
 import cv2
 import numpy as np
 import sys
 
-# for use with OSX and virtualenv
+"""FRC Vision testing with OpenCV"""
+__author__ = "tedfoodlin"
+
+
+# For use with OSX and virtualenv
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 
-# capture video from camera
+# Capture video from camera
 cap = cv2.VideoCapture(0)
 
 
 # ---------------- CONSTANTS ---------------- #
-# HSV lower and upper limits for the green we are looking for (untuned)
-lower_green = np.array([50, 20, 20])
-upper_green = np.array([70, 255, 255])
+# HSV values
+LOWER_GREEN = np.array([50, 20, 20])
+UPPER_GREEN = np.array([70, 255, 255])
+LOWER_PINK = np.array([150, 60, 60])
+UPPER_PINK = np.array([170, 255, 255])
 
-# HSV temporary test color (pink highlighter)
-lower_pink = np.array([150, 60, 60])
-upper_pink = np.array([170, 255, 255])
-
-# frame dimensions
-y = 716
-x = 1278
-# center of the frame
-frameCenterY = y / 2
-frameCenterX = x / 2
+# Frame dimensions
+FRAME_Y = 716
+FRAME_X = 1278
+FRAME_CENTER_Y = FRAME_Y / 2
+FRAME_CENTER_X = FRAME_X / 2
 # ------------------------------------------- #
 
 
 # ---------------- FUNCTIONS ---------------- #
-# removes everything but specified color
 def masking(lower, upper, frame):
+    """Mask for specified color ranges."""
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, lower, upper)
     res = cv2.bitwise_and(frame, frame, mask=mask)
     return res, mask
 
 
-# turns a contour into a polygon
 def polygon(c):
+    """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
     epsilon = 0.025 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
 
-# detect center
 def calc_center(M):
+    """Detect the center given the moment of a contour."""
     cx = int(M['m10'] / M['m00'])
     cy = int(M['m01'] / M['m00'])
     return cx, cy
 
 
-# report commands to robot on terminal
 def report_command(cx):
-    # if it is aligned with the center y-axis
-    # it is ready to shoot
-    if cx < (frameCenterX + 10) and cx > (frameCenterX - 10):
+    """Report robot commands to terminal."""
+    # if it is aligned with the center y-axis, it is ready to shoot
+    if cx < (FRAME_CENTER_X + 10) and cx > (FRAME_CENTER_X - 10):
         print("X Aligned")
     # otherwise, tell robot to turn left or right to align with goal
     else:
-        if cx > frameCenterX:
+        if cx > FRAME_CENTER_X + 10:
             print("Turn Right")
-        elif cx < frameCenterX:
+        elif cx < FRAME_CENTER_X - 10:
             print("Turn Left")
 
 
-# report state of y
 def report_y(cy):
-    if cy < (frameCenterY + 10) and cy > (frameCenterY - 10):
+    """Report state of y to terminal"""
+    if cy < (FRAME_CENTER_Y + 10) and cy > (FRAME_CENTER_Y - 10):
         print("Y Aligned")
     else:
-        if cy > frameCenterY:
+        if cy > FRAME_CENTER_Y + 10:
             print("Aim Lower")
-        elif cy < frameCenterY:
+        elif cy < FRAME_CENTER_Y - 10:
             print("Aim Higher")
 # ------------------------------------------- #
 
@@ -92,7 +88,7 @@ def main():
         ret, frame = cap.read()
 
         # remove everything but specified color
-        res, mask = masking(lower_green, upper_green, frame)
+        res, mask = masking(LOWER_GREEN, UPPER_GREEN, frame)
 
         # draw center of camera
         cv2.circle(res, (frameCenterX, frameCenterY), 5, (0, 0, 255), -1)
