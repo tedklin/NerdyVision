@@ -19,8 +19,8 @@ CAL_MODE_ON = False
 TRACK_MODE_ON = True
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([30, 60, 60])
-UPPER_GREEN = np.array([70, 255, 255])
+LOWER_GREEN = np.array([40, 20, 20])
+UPPER_GREEN = np.array([70, 220, 220])
 LOWER_PINK = np.array([150, 60, 60])
 UPPER_PINK = np.array([170, 255, 255])
 
@@ -47,14 +47,12 @@ CAL_LR = (CAL_R, CAL_LO)
 
 def check_modes():
     """Check which modes are on based on user input."""
+    cal = False
+    track = False
     if raw_input("Calibration mode on? (y/n)") == "y":
         cal = True
-    else:
-        cal = False
     if raw_input("Tracking mode on? (y/n)") == "y":
         track = True
-    else:
-        track = False
     return cal, track
 
 
@@ -102,21 +100,51 @@ def calc_center(M):
     return cx, cy
 
 
-def report_command(cx):
-    """Report robot commands to terminal."""
+def calc_power(motor_pow, error):
+    """Calculate the power to input into left motor and right motor."""
+    # Very inefficient bang-bang control
+    pow = 0
+    if (error > 200 or error < -200):
+        pow = 0.5
+    if (200 > error > 100 or -200 < error < -100):
+        pow = 0.3
+    if (100 > error > 50 or -100 < error < -50):
+        pow = 0.2
+    if (50 > error > 10 or -50 < error < -10):
+        pow = 0.1
+    if (error > 0):
+        motor_pow[0] = pow
+        motor_pow[1] = -pow
+    elif (error < 0):
+        motor_pow[0] = -pow
+        motor_pow[1] = pow
+    return motor_pow
+
+
+def is_aligned(error):
+    """Check if shooter is aligned and ready to shoot."""
+    if 10 > error > -10:
+        return True
+    else:
+        return False
+
+
+def report_command(error):
+    """Testing - how robot commands in terminal."""
     # if it is aligned with the center y-axis, it is ready to shoot
-    if FRAME_CENTER_X + 10 > cx > FRAME_CENTER_X - 10:
+    if 10 > error > -10:
         print("X Aligned")
     # otherwise, tell robot to turn left or right to align with goal
     else:
-        if cx > FRAME_CENTER_X + 10:
+        if error > 10:
             print("Turn Right")
-        elif cx < FRAME_CENTER_X - 10:
+        elif error < -10:
             print("Turn Left")
 
 
 def report_y(cy):
-    """Report state of y to terminal"""
+    """Report state of y to terminal."""
+    # Maybe useful but not necessary if you have a nice set shooter angle
     if FRAME_CENTER_Y + 10 > cy > FRAME_CENTER_Y - 10:
         print("Y Aligned")
     else:
@@ -145,10 +173,9 @@ def main():
 
         # tracking
         if track_mode_on:
-            # init states (for x)
-            turn_right = False
-            turn_left = False
-            ready = False
+            # init values (for x)
+            aligned = False
+            motor_pow = [0, 0]
 
             # remove everything but specified color
             res, mask = masking(LOWER_LIM, UPPER_LIM, frame)
@@ -183,27 +210,21 @@ def main():
                             cx, cy = calc_center(M)
                             center = (cx, cy)
 
-                            # draw and print center
+                            # draw centroid
                             cv2.circle(res, center, 5, (255, 0, 0), -1)
-                            print(center)
 
-                            # if it is aligned with the center y-axis
-                            # it is ready to shoot
-                            if FRAME_CENTER_X + 10 > cx > FRAME_CENTER_X - 10:
-                                ready = True
-                            # otherwise, tell robot to turn to align
-                            else:
-                                if cx > FRAME_CENTER_X + 10:
-                                    turn_right = True
-                                elif cx < FRAME_CENTER_X - 10:
-                                    turn_left = True
+                            # calculate error
+                            error = cx - FRAME_CENTER_X
 
-                            # report the commands given to robot on terminal
-                            report_command(cx)
-                            # report state of y (useful but not necessary)
-                            report_y(cy)
+                            # set motor powers
+                            calc_power(motor_pow, error)
+                            # report motor powers
+                            print(motor_pow)
+                            # check if shooter is aligned
+                            aligned = is_aligned(error)
+                            print(aligned)
             else:
-                print("Goal contour not found")
+                print("Contour not found")
 
             # show results
             cv2.imshow("NerdyVision", res)
