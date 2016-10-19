@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 import math
 import sys
+import time
+from networktables import NetworkTable
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 """FRC Vision testing with OpenCV Python"""
 __author__ = "tedfoodlin"
@@ -12,7 +16,6 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 
 # Capture video from camera
 cap = cv2.VideoCapture(0)
-
 
 # Set modes (if you don't want user input)
 CAL_MODE_ON = False
@@ -29,8 +32,8 @@ LOWER_LIM = LOWER_GREEN
 UPPER_LIM = UPPER_GREEN
 
 # Frame dimensions
-FRAME_Y = 716
-FRAME_X = 1278
+FRAME_Y = 720
+FRAME_X = 1280
 FRAME_CENTER_Y = FRAME_Y / 2
 FRAME_CENTER_X = FRAME_X / 2
 
@@ -104,8 +107,10 @@ def calc_power(motor_pow, error):
     """Calculate the power to input into left motor and right motor."""
     # Very inefficient bang-bang control
     pow = 0
-    if (error > 200 or error < -200):
+    if (error > 400 or error < -400):
         pow = 0.5
+    if (400 > error > 200 or -400 < error < -200):
+        pow = 0.4
     if (200 > error > 100 or -200 < error < -100):
         pow = 0.3
     if (100 > error > 50 or -100 < error < -50):
@@ -163,8 +168,36 @@ def main():
     # comment out next line if this feature is not desired
     cal_mode_on, track_mode_on = check_modes()
 
-    while True:
+    # network table setup
+    NetworkTable.setIPAddress("127.0.0.1")  # 127.0.0.1 with tester program
+    NetworkTable.setClientMode()
+    NetworkTable.initialize()
+    sd = NetworkTable.getTable("SmartDashboard")
+
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
+    # vc.set(cv2.CAP_PROP_FPS,30)
+    cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+
+    # Set up FPS list and iterator
+    times = [0] * 25
+    time_idx = 0
+    time_start = time.time()
+    camfps = 0
+
+    while 687:
         ret, frame = cap.read()
+
+        # Compute FPS information
+        time_end = time.time()
+        times[time_idx] = time_end - time_start
+        time_idx += 1
+        if time_idx >= len(times):
+            camfps = 1 / (sum(times) / len(times))
+            time_idx = 0
+        if time_idx > 0 and time_idx % 5 == 0:
+            camfps = 1 / (sum(times) / len(times))
+        time_start = time_end
 
         # calibration
         if cal_mode_on:
@@ -226,11 +259,19 @@ def main():
             else:
                 print("Contour not found")
 
-            # show results
+            # results
             cv2.imshow("NerdyVision", res)
+            print(camfps)
+            try:
+                # send to network tables
+                sd.putNumber('LEFT_POW', motor_pow[0])
+                sd.putNumber('RIGHT_POW', motor_pow[1])
+                sd.putBoolean('IS_ALIGNED', aligned)
+            except:
+                print('lol got you there')
 
         # capture a keypress.
-        key = cv2.waitKey(10) & 0xFF
+        key = cv2.waitKey(20) & 0xFF
         # escape key.
         if key == 27:
             break
