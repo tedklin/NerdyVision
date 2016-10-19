@@ -23,7 +23,7 @@ TRACK_MODE_ON = True
 
 # HSV range values for different colors
 LOWER_GREEN = np.array([40, 20, 20])
-UPPER_GREEN = np.array([70, 220, 220])
+UPPER_GREEN = np.array([80, 220, 220])
 LOWER_PINK = np.array([150, 60, 60])
 UPPER_PINK = np.array([170, 255, 255])
 
@@ -105,18 +105,18 @@ def calc_center(M):
 
 def calc_power(motor_pow, error):
     """Calculate the power to input into left motor and right motor."""
-    # Very inefficient bang-bang control
+    # Inefficient and untested bang-bang control, needs to be changed
     pow = 0
     if (error > 400 or error < -400):
         pow = 0.5
     if (400 > error > 200 or -400 < error < -200):
-        pow = 0.4
-    if (200 > error > 100 or -200 < error < -100):
         pow = 0.3
-    if (100 > error > 50 or -100 < error < -50):
+    if (200 > error > 100 or -200 < error < -100):
         pow = 0.2
-    if (50 > error > 10 or -50 < error < -10):
+    if (100 > error > 50 or -100 < error < -50):
         pow = 0.1
+    if (50 > error > 10 or -50 < error < -10):
+        pow = 0.05
     if (error > 0):
         motor_pow[0] = pow
         motor_pow[1] = -pow
@@ -135,11 +135,9 @@ def is_aligned(error):
 
 
 def report_command(error):
-    """Testing - how robot commands in terminal."""
-    # if it is aligned with the center y-axis, it is ready to shoot
+    """Testing - show robot commands in terminal."""
     if 10 > error > -10:
         print("X Aligned")
-    # otherwise, tell robot to turn left or right to align with goal
     else:
         if error > 10:
             print("Turn Right")
@@ -169,20 +167,22 @@ def main():
     cal_mode_on, track_mode_on = check_modes()
 
     # network table setup
-    NetworkTable.setIPAddress("127.0.0.1")  # 127.0.0.1 with tester program
+    NetworkTable.setIPAddress("127.0.0.1")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
-    sd = NetworkTable.getTable("SmartDashboard")
+    SmartDashboard = NetworkTable.getTable("SmartDashboard")
 
+    # adjust camera settings
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
-    # vc.set(cv2.CAP_PROP_FPS,30)
+    # cap.set(cv2.CAP_PROP_FPS,30)
     cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
     # Set up FPS list and iterator
     times = [0] * 25
     time_idx = 0
     time_start = time.time()
+    time_current = time.clock()
     camfps = 0
 
     while 687:
@@ -190,6 +190,7 @@ def main():
 
         # Compute FPS information
         time_end = time.time()
+        time_end_const = time.clock()
         times[time_idx] = time_end - time_start
         time_idx += 1
         if time_idx >= len(times):
@@ -198,6 +199,9 @@ def main():
         if time_idx > 0 and time_idx % 5 == 0:
             camfps = 1 / (sum(times) / len(times))
         time_start = time_end
+        time_current += time_end_const
+        print("FPS: " + str(camfps))
+        print("Time: " + str(time_current))
 
         # calibration
         if cal_mode_on:
@@ -252,27 +256,24 @@ def main():
                             # set motor powers
                             calc_power(motor_pow, error)
                             # report motor powers
-                            print(motor_pow)
+                            print("Motor power: " + str(motor_pow))
                             # check if shooter is aligned
                             aligned = is_aligned(error)
-                            print(aligned)
-            else:
-                print("Contour not found")
+                            print("Aligned? " + str(aligned))
 
             # results
             cv2.imshow("NerdyVision", res)
-            print(camfps)
             try:
                 # send to network tables
-                sd.putNumber('LEFT_POW', motor_pow[0])
-                sd.putNumber('RIGHT_POW', motor_pow[1])
-                sd.putBoolean('IS_ALIGNED', aligned)
+                SmartDashboard.putNumber('LEFT_POW', motor_pow[0])
+                SmartDashboard.putNumber('RIGHT_POW', motor_pow[1])
+                SmartDashboard.putBoolean('IS_ALIGNED', aligned)
             except:
                 print('lol got you there')
 
-        # capture a keypress.
+        # capture a keypress
         key = cv2.waitKey(20) & 0xFF
-        # escape key.
+        # escape key
         if key == 27:
             break
 
