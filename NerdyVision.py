@@ -107,20 +107,20 @@ def calc_power(motor_pow, error):
     """Calculate the power to input into left motor and right motor."""
     # Inefficient and untested bang-bang control, needs to be changed
     pow = 0
-    if (error > 400 or error < -400):
+    if error > 400 or error < -400:
         pow = 0.5
-    if (400 > error > 200 or -400 < error < -200):
+    if 400 > error > 200 or -400 < error < -200:
         pow = 0.3
-    if (200 > error > 100 or -200 < error < -100):
+    if 200 > error > 100 or -200 < error < -100:
         pow = 0.2
-    if (100 > error > 50 or -100 < error < -50):
+    if 100 > error > 50 or -100 < error < -50:
         pow = 0.1
-    if (50 > error > 10 or -50 < error < -10):
+    if 50 > error > 10 or -50 < error < -10:
         pow = 0.05
-    if (error > 0):
+    if error > 0:
         motor_pow[0] = pow
         motor_pow[1] = -pow
-    elif (error < 0):
+    elif error < 0:
         motor_pow[0] = -pow
         motor_pow[1] = pow
     return motor_pow
