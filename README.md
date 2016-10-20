@@ -1,11 +1,19 @@
 # NerdyVision
 
-###FRC Vision testing using OpenCV Python
+### FRC Vision testing using OpenCV Python
 
-##Author 
+## Author 
 tedfoodlin
 
-##Calibration mode
+## What You Need 
+
+Python, NumPy and OpenCV (pyimagesearch has some nice tutorials on installing OpenCV Python)
+
+[PyNetworkTables](https://github.com/robotpy/pynetworktables)
+
+[Food](https://www.google.com/#q=food)
+
+## Calibration Mode
 
 1. Set a small rectangle as the calibration box (can change the size in constants)
 
@@ -17,7 +25,7 @@ tedfoodlin
 
 5. Print HSV values for every frame
 
-##Tracking mode
+## Tracking Mode
 
 1. Get frame from camera
 
@@ -29,4 +37,4 @@ tedfoodlin
 
 5. If the center of the camera is aligned with the center x-axis of the object (goal), then it is ready to shoot
 
-6. Otherwise, outputs how to move in order to get align the center x-axis of the camera and the center x-axis of the object.
+6. Otherwise, calculates left and right motor values (drivetrain) in order to get align the center x-axis of the camera and the center x-axis of the object. Outputs to SmartDashboard through network tables and prints info to terminal.
