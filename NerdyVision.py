@@ -105,7 +105,7 @@ def calc_center(M):
 
 def calc_power(motor_pow, error):
     """Calculate the power to input into left motor and right motor."""
-    # Inefficient and untested bang-bang control, needs to be changed
+    # Inefficient and untested control, needs to be changed
     pow = 0
     if error > 400 or error < -400:
         pow = 0.5
@@ -259,7 +259,7 @@ def main():
                             print("Motor power: " + str(motor_pow))
                             # check if shooter is aligned
                             aligned = is_aligned(error)
-                            print("Aligned? " + str(aligned))
+                            print("Aligned: " + str(aligned))
 
             # results
             cv2.imshow("NerdyVision", res)
