@@ -31,19 +31,33 @@ UPPER_PINK = np.array([170, 255, 255])
 LOWER_LIM = LOWER_GREEN
 UPPER_LIM = UPPER_GREEN
 
-# Frame dimensions
-FRAME_Y = 720
-FRAME_X = 1280
-FRAME_CENTER_Y = FRAME_Y / 2
-FRAME_CENTER_X = FRAME_X / 2
+# Mac webcam dimensions
+MAC_FRAME_X = 1280
+MAC_FRAME_Y = 720
+MAC_FOV_ANGLE = 60
+MAC_FOCAL_LENGTH = 15.118110236
+
+# Axis M1011 dimensions
+AXIS_FRAME_X = 640
+AXIS_FRAME_Y = 480
+AXIS_FOV_ANGLE = 47
+AXIS_FOCAL_LENGTH = 16.63
+
+# Dimensions in use
+FRAME_X = MAC_FRAME_X
+FRAME_Y = MAC_FRAME_Y
+FOV_ANGLE = MAC_FOV_ANGLE
+FOCAL_LENGTH = MAC_FOCAL_LENGTH
+FRAME_CX = FRAME_X / 2
+FRAME_CY = FRAME_Y / 2
 
 # Calibration box dimensions
 CAL_AREA = 1600
 CAL_SIZE = int(math.sqrt(CAL_AREA))
-CAL_UP = FRAME_CENTER_Y + (CAL_SIZE / 2)
-CAL_LO = FRAME_CENTER_Y - (CAL_SIZE / 2)
-CAL_R = FRAME_CENTER_X - (CAL_SIZE / 2)
-CAL_L = FRAME_CENTER_X + (CAL_SIZE / 2)
+CAL_UP = FRAME_CY + (CAL_SIZE / 2)
+CAL_LO = FRAME_CY - (CAL_SIZE / 2)
+CAL_R = FRAME_CX - (CAL_SIZE / 2)
+CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
@@ -81,10 +95,10 @@ def masking(lower, upper, frame):
 def draw_static(img):
     """Draw references on frame."""
     # draw center of frame
-    cv2.circle(img, (FRAME_CENTER_X, FRAME_CENTER_Y), 5,
+    cv2.circle(img, (FRAME_CX, FRAME_CY), 5,
                (0, 0, 255), -1)
     # draw reference line for x position
-    cv2.line(img, (FRAME_CENTER_X, 0), (FRAME_CENTER_X, FRAME_Y),
+    cv2.line(img, (FRAME_CX, 0), (FRAME_CX, FRAME_Y),
              (0, 0, 255), 2)
 
 
@@ -103,27 +117,9 @@ def calc_center(M):
     return cx, cy
 
 
-def calc_power(motor_pow, error):
-    """Calculate the power to input into left motor and right motor."""
-    # Inefficient and untested control, needs to be changed
-    pow = 0
-    if error > 400 or error < -400:
-        pow = 0.5
-    if 400 > error > 200 or -400 < error < -200:
-        pow = 0.3
-    if 200 > error > 100 or -200 < error < -100:
-        pow = 0.2
-    if 100 > error > 50 or -100 < error < -50:
-        pow = 0.1
-    if 50 > error > 10 or -50 < error < -10:
-        pow = 0.05
-    if error > 0:
-        motor_pow[0] = pow
-        motor_pow[1] = -pow
-    elif error < 0:
-        motor_pow[0] = -pow
-        motor_pow[1] = pow
-    return motor_pow
+def calc_horiz_angle(error):
+    """Calculates the horizontal angle from pixel error"""
+    return math.atan(error / FOCAL_LENGTH)
 
 
 def is_aligned(error):
@@ -148,12 +144,12 @@ def report_command(error):
 def report_y(cy):
     """Report state of y to terminal."""
     # Maybe useful but not necessary if you have a nice set shooter angle
-    if FRAME_CENTER_Y + 10 > cy > FRAME_CENTER_Y - 10:
+    if FRAME_CY + 10 > cy > FRAME_CY - 10:
         print("Y Aligned")
     else:
-        if cy > FRAME_CENTER_Y + 10:
+        if cy > FRAME_CY + 10:
             print("Aim Lower")
-        elif cy < FRAME_CENTER_Y - 10:
+        elif cy < FRAME_CY - 10:
             print("Aim Higher")
 
 
@@ -182,7 +178,6 @@ def main():
     times = [0] * 25
     time_idx = 0
     time_start = time.time()
-    time_current = time.clock()
     camfps = 0
 
     while 687:
@@ -190,7 +185,6 @@ def main():
 
         # Compute FPS information
         time_end = time.time()
-        time_end_const = time.clock()
         times[time_idx] = time_end - time_start
         time_idx += 1
         if time_idx >= len(times):
@@ -199,9 +193,8 @@ def main():
         if time_idx > 0 and time_idx % 5 == 0:
             camfps = 1 / (sum(times) / len(times))
         time_start = time_end
-        time_current += time_end_const
         print("FPS: " + str(camfps))
-        print("Time: " + str(time_current))
+        print("Time: " + str(time.time()))
 
         # calibration
         if cal_mode_on:
@@ -211,8 +204,8 @@ def main():
         # tracking
         if track_mode_on:
             # init values (for x)
+            angle_to_turn = 0
             aligned = False
-            motor_pow = [0, 0]
 
             # remove everything but specified color
             res, mask = masking(LOWER_LIM, UPPER_LIM, frame)
@@ -250,13 +243,11 @@ def main():
                             # draw centroid
                             cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            # calculate error
-                            error = cx - FRAME_CENTER_X
+                            # calculate error in degrees
+                            error = cx - FRAME_CX
+                            angle_to_turn = calc_horiz_angle(error)
+                            print("Angle to turn: " + str(angle_to_turn))
 
-                            # set motor powers
-                            calc_power(motor_pow, error)
-                            # report motor powers
-                            print("Motor power: " + str(motor_pow))
                             # check if shooter is aligned
                             aligned = is_aligned(error)
                             print("Aligned: " + str(aligned))
@@ -265,8 +256,7 @@ def main():
             cv2.imshow("NerdyVision", res)
             try:
                 # send to network tables
-                SmartDashboard.putNumber('LEFT_POW', motor_pow[0])
-                SmartDashboard.putNumber('RIGHT_POW', motor_pow[1])
+                SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
                 SmartDashboard.putBoolean('IS_ALIGNED', aligned)
             except:
                 print('lol got you there')
