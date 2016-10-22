@@ -35,6 +35,8 @@ Python, NumPy and OpenCV (pyimagesearch has some nice tutorials on installing Op
 
 4. Find centroid of that object (ideal position to shoot)
 
-5. If the center of the camera is aligned with the center x-axis of the object (goal), then it is ready to shoot
+5. Calculates error and converts from pixels to degrees
 
-6. Otherwise, calculates left and right motor values (drivetrain) in order to get align the center x-axis of the camera and the center x-axis of the object. Outputs to SmartDashboard through network tables and prints info to terminal.
+6. If the center of the camera is aligned with the center x-axis of the object (goal), then it is ready to shoot
+
+7. Send data over SmartDashboard and print in terminal.
