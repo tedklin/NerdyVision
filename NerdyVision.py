@@ -31,7 +31,7 @@ UPPER_PINK = np.array([170, 255, 255])
 LOWER_LIM = LOWER_GREEN
 UPPER_LIM = UPPER_GREEN
 
-# Mac webcam dimensions
+# Mac webcam dimensions (approx)
 MAC_FRAME_X = 1280
 MAC_FRAME_Y = 720
 MAC_FOV_ANGLE = 60
@@ -124,7 +124,7 @@ def calc_horiz_angle(error):
 
 def is_aligned(error):
     """Check if shooter is aligned and ready to shoot."""
-    if 10 > error > -10:
+    if 1 > error > -1:
         return True
     else:
         return False
@@ -132,7 +132,7 @@ def is_aligned(error):
 
 def report_command(error):
     """Testing - show robot commands in terminal."""
-    if 10 > error > -10:
+    if 1 > error > -1:
         print("X Aligned")
     else:
         if error > 10:
@@ -174,7 +174,7 @@ def main():
     # cap.set(cv2.CAP_PROP_FPS,30)
     cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
-    # Set up FPS list and iterator
+    # set up FPS list and iterator
     times = [0] * 25
     time_idx = 0
     time_start = time.time()
@@ -183,7 +183,7 @@ def main():
     while 687:
         ret, frame = cap.read()
 
-        # Compute FPS information
+        # compute FPS information
         time_end = time.time()
         times[time_idx] = time_end - time_start
         time_idx += 1
@@ -249,7 +249,7 @@ def main():
                             print("Angle to turn: " + str(angle_to_turn))
 
                             # check if shooter is aligned
-                            aligned = is_aligned(error)
+                            aligned = is_aligned(angle_to_turn)
                             print("Aligned: " + str(aligned))
 
             # results
