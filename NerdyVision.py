@@ -207,8 +207,11 @@ def main():
             angle_to_turn = 0
             aligned = False
 
+            # gaussian blur to remove noise
+            blur = cv2.GaussianBlur(frame, (11, 11), 0)
+
             # remove everything but specified color
-            res, mask = masking(LOWER_LIM, UPPER_LIM, frame)
+            res, mask = masking(LOWER_LIM, UPPER_LIM, blur)
 
             # draw references
             draw_static(res)
@@ -259,7 +262,7 @@ def main():
                 SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
                 SmartDashboard.putBoolean('IS_ALIGNED', aligned)
             except:
-                print('lol got you there')
+                print("DATA NOT SENDING...")
 
         # capture a keypress
         key = cv2.waitKey(20) & 0xFF
