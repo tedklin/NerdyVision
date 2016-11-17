@@ -26,10 +26,12 @@ LOWER_GREEN = np.array([40, 20, 20])
 UPPER_GREEN = np.array([80, 220, 220])
 LOWER_PINK = np.array([150, 60, 60])
 UPPER_PINK = np.array([170, 255, 255])
+LOWER_BLUE = np.array([90, 210, 70])
+UPPER_BLUE = np.array([105, 260, 120])
 
 # Set HSV range
-LOWER_LIM = LOWER_GREEN
-UPPER_LIM = UPPER_GREEN
+LOWER_LIM = LOWER_BLUE
+UPPER_LIM = UPPER_BLUE
 
 # Mac webcam dimensions (approx)
 MAC_FRAME_X = 1280
