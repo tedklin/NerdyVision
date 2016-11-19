@@ -1,15 +1,17 @@
 # NerdyVision
 
-### FRC Vision testing using OpenCV Python
+### FRC Vision Processing using OpenCV Python
 
 ## Author 
 tedfoodlin
 
 ## What You Need 
 
-Python, NumPy and OpenCV (pyimagesearch has some nice tutorials on installing OpenCV Python)
+Python, NumPy and OpenCV
 
 [PyNetworkTables](https://github.com/robotpy/pynetworktables)
+
+Axis M1013 Network Camera
 
 [Food](https://www.google.com/#q=food)
 
@@ -39,4 +41,4 @@ Python, NumPy and OpenCV (pyimagesearch has some nice tutorials on installing Op
 
 6. If the center of the camera is aligned with the center x-axis of the object (goal), then it is ready to shoot
 
-7. Send data over SmartDashboard and print in terminal.
+7. Send data over NetworkTables and print in terminal.
