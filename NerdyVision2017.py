@@ -16,10 +16,12 @@ cap = cv2.VideoCapture(0)
 # Set modes (if you don't want user input)
 CAL_MODE_ON = False
 TRACK_MODE_ON = True
+SHOOTING = True
+GEARS = False
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([40, 20, 20])
-UPPER_GREEN = np.array([80, 220, 220])
+LOWER_GREEN = np.array([50, 20, 20])
+UPPER_GREEN = np.array([70, 220, 220])
 
 # Set HSV range
 LOWER_LIM = LOWER_GREEN
@@ -54,11 +56,17 @@ def check_modes():
     """Check which modes are on based on user input."""
     cal = False
     track = False
+    shooting = False
+    gears = False
     if raw_input("Calibration mode on? (y/n)") == "y":
         cal = True
     if raw_input("Tracking mode on? (y/n)") == "y":
         track = True
-    return cal, track
+    if raw_input("Shooting mode on? (y/n)") == "y":
+        track = True
+    if raw_input("Gears mode on? (y/n)") == "y":
+        track = True
+    return cal, track, shooting, gears
 
 
 def calibration_box(img):
@@ -146,9 +154,12 @@ def main():
     cal_mode_on = CAL_MODE_ON
     track_mode_on = TRACK_MODE_ON
 
+    shooting = SHOOTING
+    gears = GEARS
+
     # turn on modes specified by user
     # comment out next line if this feature is not desired
-    cal_mode_on, track_mode_on = check_modes()
+    cal_mode_on, track_mode_on, shooting, gears = check_modes()
 
     # network table setup
     NetworkTable.setIPAddress("127.0.0.1")
@@ -190,7 +201,7 @@ def main():
             cv2.imshow("NerdyCalibration", frame)
 
         # tracking
-        if track_mode_on:
+        elif track_mode_on:
             # init values (for x)
             angle_to_turn = 0
             aligned = False
@@ -209,41 +220,40 @@ def main():
                                     cv2.CHAIN_APPROX_SIMPLE)[-2]
             center = None
 
-            # only proceed if at least one contour was found
-            if len(cnts) > 0:
-                # find the largest contour (closest goal) in the mask
-                c = max(cnts, key=cv2.contourArea)
+            if shooting:
+                # only proceed if at least one contour was found
+                if len(cnts) > 0:
+                    # find the largest contour (closest goal) in the mask
+                    c = max(cnts, key=cv2.contourArea)
 
-                # make sure the largest contour is significant
-                area = cv2.contourArea(c)
-                if area > 1500:
-                    # make suggested contour into a polygon
+                    # make sure the largest contour is significant
+                    area = cv2.contourArea(c)
+
                     goal = polygon(c)
 
-                    # make sure goal contour has 4 sides
-                    if len(goal) == 4:
-                        # draw the contour
-                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    # draw the contour
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                        # calculate centroid
-                        M = cv2.moments(goal)
-                        if M['m00'] > 0:
-                            cx, cy = calc_center(M)
-                            center = (cx, cy)
+                    # calculate centroid
+                    M = cv2.moments(goal)
+                    if M['m00'] > 0:
+                        cx, cy = calc_center(M)
+                        center = (cx, cy)
 
-                            # draw centroid
-                            cv2.circle(res, center, 5, (255, 0, 0), -1)
+                        # draw centroid
+                        cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            # calculate error in degrees
-                            error = cx - FRAME_CX
-                            angle_to_turn = calc_horiz_angle(error)
-                            print("Angle to turn: " + str(angle_to_turn))
+                        # calculate error in degrees
+                        error = cx - FRAME_CX
+                        angle_to_turn = calc_horiz_angle(error)
+                        print("Angle to turn: " + str(angle_to_turn))
 
-                            # check if shooter is aligned
-                            aligned = is_aligned(angle_to_turn)
-                            print("Aligned: " + str(aligned))
+                        # check if shooter is aligned
+                        aligned = is_aligned(angle_to_turn)
+                        print("Aligned: " + str(aligned))
 
-                            report_command(error)
+                        report_command(error)
+                        report_y(cy)
 
             # results
             cv2.imshow("NerdyVision", res)
