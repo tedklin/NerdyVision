@@ -7,7 +7,7 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""FRC Vision testing on laptop with webcam"""
+"""FRC 2017 Vision testing on laptop with webcam"""
 __author__ = "tedfoodlin"
 
 # Capture video from camera
@@ -20,8 +20,8 @@ SHOOTING = True
 GEARS = False
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([50, 20, 20])
-UPPER_GREEN = np.array([70, 220, 220])
+LOWER_GREEN = np.array([70, 20, 20])
+UPPER_GREEN = np.array([90, 230, 230])
 
 # Set HSV range
 LOWER_LIM = LOWER_GREEN
@@ -51,6 +51,10 @@ CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
+# Gear dimensions
+MAX_AREA = 2000
+MIN_AREA = 4000
+
 
 def check_modes():
     """Check which modes are on based on user input."""
@@ -62,10 +66,10 @@ def check_modes():
         cal = True
     if raw_input("Tracking mode on? (y/n)") == "y":
         track = True
-    if raw_input("Shooting mode on? (y/n)") == "y":
-        track = True
-    if raw_input("Gears mode on? (y/n)") == "y":
-        track = True
+        if raw_input("Shooting mode on? (y/n)") == "y":
+            shooting = True
+        if raw_input("Gears mode on? (y/n)") == "y":
+            gears = True
     return cal, track, shooting, gears
 
 
@@ -101,7 +105,7 @@ def draw_static(img):
 def polygon(c):
     """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
-    epsilon = 0.025 * cv2.arcLength(hull, True)
+    epsilon = 0 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
@@ -118,12 +122,17 @@ def calc_horiz_angle(error):
     return math.atan(error / FOCAL_LENGTH)
 
 
-def is_aligned(error):
+def is_aligned(angle_to_turn):
     """Check if shooter is aligned and ready to shoot."""
-    if 1 > error > -1:
+    if 1 > angle_to_turn > -1:
         return True
     else:
         return False
+
+
+def average(x1, x2):
+    """"Take average of 2 numbers"""
+    return (x1 + x2) / 2
 
 
 def report_command(error):
@@ -254,6 +263,53 @@ def main():
 
                         report_command(error)
                         report_y(cy)
+
+            elif gears:
+                # only proceed if at least two contours (two blocks around peg) was found
+                if len(cnts) > 1:
+                    goals = [0]
+                    # find the two blocks in the mask based on areas
+                    for c in cnts:
+                        area = cv2.contourArea(c)
+                        if MIN_AREA < area < MAX_AREA:
+                            goals.append(c)
+
+                    # draw the contours
+                    cv2.drawContours(res, [goals], 0, (255, 0, 0), 5)
+
+                    centers_x = [0]
+                    centers_y = [0]
+
+                    # calculate centroids
+                    for goal in goals:
+                        M = cv2.moments(goal)
+                        if M['m00'] > 0:
+                            cx, cy = calc_center(M)
+                            center = (cx, cy)
+
+                            # draw centroid
+                            cv2.circle(res, center, 5, (255, 0, 0), -1)
+
+                            centers_x.append(cx)
+                            centers_y.append(cy)
+
+                    # calculate center of two contours (blocks next to peg)
+                    if centers_x.len() == 2 && centers_y.len() == 2:
+                        target_x = average((centers_x[0] + centers_x[1])/2)
+                        target_y = average((centers_y[0] + centers_y[1])/2)
+                        cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
+
+                        # calculate angle to turn
+                        error = target_x - FRAME_CX
+                        angle_to_turn = calc_horiz_angle(error)
+                        print("Angle to turn: " + str(angle_to_turn))
+
+                        # check if gear mechanism is aligned
+                        aligned = is_aligned(angle_to_turn)
+                        print("Aligned: " + str(aligned))
+
+                        report_command(error)
+                        report_y(target_y)
 
             # results
             cv2.imshow("NerdyVision", res)
