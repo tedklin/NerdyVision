@@ -294,7 +294,7 @@ def main():
                             centers_y.append(cy)
 
                     # calculate center of two contours (blocks next to peg)
-                    if centers_x.len() == 2 && centers_y.len() == 2:
+                    if centers_x.len() == 2 and centers_y.len() == 2:
                         target_x = average((centers_x[0] + centers_x[1])/2)
                         target_y = average((centers_y[0] + centers_y[1])/2)
                         cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)

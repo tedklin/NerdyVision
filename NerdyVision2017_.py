@@ -250,7 +250,7 @@ def main():
                             centers_y.append(cy)
 
                     # calculate center of two contours (blocks next to peg)
-                    if centers_x.len() == 2 && centers_y.len() == 2:
+                    if centers_x.len() == 2 and centers_y.len() == 2:
                         target_x = average((centers_x[0] + centers_x[1])/2)
                         target_y = average((centers_y[0] + centers_y[1])/2)
                         cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
@@ -275,16 +275,6 @@ def main():
                 SmartDashboard.putBoolean('IS_ALIGNED', aligned)
             except:
                 print("DATA NOT SENDING...")
-
-        # capture a keypress
-        key = cv2.waitKey(20) & 0xFF
-        # escape key
-        if key == 27:
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
 
 if __name__ == '__main__':
     main()

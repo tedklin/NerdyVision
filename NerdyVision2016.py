@@ -93,7 +93,7 @@ def draw_static(img):
 def polygon(c):
     """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
-    epsilon = 0.025 * cv2.arcLength(hull, True)
+    epsilon = 0.02 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
