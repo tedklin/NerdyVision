@@ -7,7 +7,7 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""FRC 2017 Vision testing on laptop with webcam"""
+"""2017 FRC Vision testing on laptop with webcam"""
 __author__ = "tedfoodlin"
 
 # Capture video from camera

@@ -1,3 +1,3 @@
-Temporary tests for HSV value calibration and vision tracking made using a drawing using a green highlighter that represents the high goal.
+Temporary tests for HSV value calibration and vision tracking made using a drawing using a green highlighter that represents the targets.
 
 Commands based on perspective of camera of the robot.

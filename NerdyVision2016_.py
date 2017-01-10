@@ -6,7 +6,7 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""FRC Vision Processing on Driver Station with Axis"""
+"""2016 FRC Vision Processing on Driver Station with Axis"""
 __author__ = "tedfoodlin"
 
 # Default modes
