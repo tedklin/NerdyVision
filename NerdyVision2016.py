@@ -7,7 +7,7 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""FRC 2017 Vision testing on laptop with webcam"""
+"""FRC Vision testing on laptop with webcam"""
 __author__ = "tedfoodlin"
 
 # Capture video from camera
@@ -16,12 +16,10 @@ cap = cv2.VideoCapture(0)
 # Set modes (if you don't want user input)
 CAL_MODE_ON = False
 TRACK_MODE_ON = True
-SHOOTING = True
-GEARS = False
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([70, 20, 20])
-UPPER_GREEN = np.array([90, 230, 230])
+LOWER_GREEN = np.array([40, 20, 20])
+UPPER_GREEN = np.array([80, 220, 220])
 
 # Set HSV range
 LOWER_LIM = LOWER_GREEN
@@ -51,26 +49,16 @@ CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
-# Gear dimensions
-MAX_AREA = 2000
-MIN_AREA = 4000
-
 
 def check_modes():
     """Check which modes are on based on user input."""
     cal = False
     track = False
-    shooting = False
-    gears = False
     if raw_input("Calibration mode on? (y/n)") == "y":
         cal = True
     if raw_input("Tracking mode on? (y/n)") == "y":
         track = True
-        if raw_input("Shooting mode on? (y/n)") == "y":
-            shooting = True
-        if raw_input("Gears mode on? (y/n)") == "y":
-            gears = True
-    return cal, track, shooting, gears
+    return cal, track
 
 
 def calibration_box(img):
@@ -105,7 +93,7 @@ def draw_static(img):
 def polygon(c):
     """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
-    epsilon = 0 * cv2.arcLength(hull, True)
+    epsilon = 0.025 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
@@ -122,17 +110,12 @@ def calc_horiz_angle(error):
     return math.atan(error / FOCAL_LENGTH)
 
 
-def is_aligned(angle_to_turn):
+def is_aligned(error):
     """Check if shooter is aligned and ready to shoot."""
-    if 1 > angle_to_turn > -1:
+    if 1 > error > -1:
         return True
     else:
         return False
-
-
-def average(x1, x2):
-    """"Take average of 2 numbers"""
-    return (x1 + x2) / 2
 
 
 def report_command(error):
@@ -163,12 +146,9 @@ def main():
     cal_mode_on = CAL_MODE_ON
     track_mode_on = TRACK_MODE_ON
 
-    shooting = SHOOTING
-    gears = GEARS
-
     # turn on modes specified by user
     # comment out next line if this feature is not desired
-    cal_mode_on, track_mode_on, shooting, gears = check_modes()
+    cal_mode_on, track_mode_on = check_modes()
 
     # network table setup
     NetworkTable.setIPAddress("127.0.0.1")
@@ -210,7 +190,7 @@ def main():
             cv2.imshow("NerdyCalibration", frame)
 
         # tracking
-        elif track_mode_on:
+        if track_mode_on:
             # init values (for x)
             angle_to_turn = 0
             aligned = False
@@ -229,59 +209,23 @@ def main():
                                     cv2.CHAIN_APPROX_SIMPLE)[-2]
             center = None
 
-            if shooting:
-                # only proceed if at least one contour was found
-                if len(cnts) > 0:
-                    # find the largest contour (closest goal) in the mask
-                    c = max(cnts, key=cv2.contourArea)
+            # only proceed if at least one contour was found
+            if len(cnts) > 0:
+                # find the largest contour (closest goal) in the mask
+                c = max(cnts, key=cv2.contourArea)
 
-                    # make sure the largest contour is significant
-                    area = cv2.contourArea(c)
-
+                # make sure the largest contour is significant
+                area = cv2.contourArea(c)
+                if area > 1500:
+                    # make suggested contour into a polygon
                     goal = polygon(c)
 
-                    # draw the contour
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    # make sure goal contour has 4 sides
+                    if len(goal) == 4:
+                        # draw the contour
+                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                    # calculate centroid
-                    M = cv2.moments(goal)
-                    if M['m00'] > 0:
-                        cx, cy = calc_center(M)
-                        center = (cx, cy)
-
-                        # draw centroid
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
-
-                        # calculate error in degrees
-                        error = cx - FRAME_CX
-                        angle_to_turn = calc_horiz_angle(error)
-                        print("Angle to turn: " + str(angle_to_turn))
-
-                        # check if shooter is aligned
-                        aligned = is_aligned(angle_to_turn)
-                        print("Aligned: " + str(aligned))
-
-                        report_command(error)
-                        report_y(cy)
-
-            elif gears:
-                # only proceed if at least two contours (two blocks around peg) was found
-                if len(cnts) > 1:
-                    goals = [0]
-                    # find the two blocks in the mask based on areas
-                    for c in cnts:
-                        area = cv2.contourArea(c)
-                        if MIN_AREA < area < MAX_AREA:
-                            goals.append(c)
-
-                    # draw the contours
-                    cv2.drawContours(res, [goals], 0, (255, 0, 0), 5)
-
-                    centers_x = [0]
-                    centers_y = [0]
-
-                    # calculate centroids of two separate contours
-                    for goal in goals:
+                        # calculate centroid
                         M = cv2.moments(goal)
                         if M['m00'] > 0:
                             cx, cy = calc_center(M)
@@ -290,26 +234,16 @@ def main():
                             # draw centroid
                             cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            centers_x.append(cx)
-                            centers_y.append(cy)
+                            # calculate error in degrees
+                            error = cx - FRAME_CX
+                            angle_to_turn = calc_horiz_angle(error)
+                            print("Angle to turn: " + str(angle_to_turn))
 
-                    # calculate center of two contours (blocks next to peg)
-                    if centers_x.len() == 2 && centers_y.len() == 2:
-                        target_x = average((centers_x[0] + centers_x[1])/2)
-                        target_y = average((centers_y[0] + centers_y[1])/2)
-                        cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
+                            # check if shooter is aligned
+                            aligned = is_aligned(angle_to_turn)
+                            print("Aligned: " + str(aligned))
 
-                        # calculate angle to turn
-                        error = target_x - FRAME_CX
-                        angle_to_turn = calc_horiz_angle(error)
-                        print("Angle to turn: " + str(angle_to_turn))
-
-                        # check if gear mechanism is aligned
-                        aligned = is_aligned(angle_to_turn)
-                        print("Aligned: " + str(aligned))
-
-                        report_command(error)
-                        report_y(target_y)
+                            report_command(error)
 
             # results
             cv2.imshow("NerdyVision", res)

@@ -1,41 +1,29 @@
 import cv2
 import numpy as np
+import urllib
 import math
-import sys
-import time
 from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""FRC Vision testing on laptop with webcam"""
+"""FRC Vision Processing on Driver Station with Axis"""
 __author__ = "tedfoodlin"
 
-# Capture video from camera
-cap = cv2.VideoCapture(0)
-
-# Set modes (if you don't want user input)
+# Set modes (no user input)
 CAL_MODE_ON = False
 TRACK_MODE_ON = True
+SHOOTING = True
+GEARS = False
 
-# HSV range values for different colors
-LOWER_GREEN = np.array([40, 20, 20])
-UPPER_GREEN = np.array([80, 220, 220])
+# HSV range values for green
+LOWER_LIM = np.array([40, 20, 20])
+UPPER_LIM = np.array([80, 220, 220])
 
-# Set HSV range
-LOWER_LIM = LOWER_GREEN
-UPPER_LIM = UPPER_GREEN
-
-# Mac webcam dimensions (approx)
-MAC_FRAME_X = 1280
-MAC_FRAME_Y = 720
-MAC_FOV_ANGLE = 60
-MAC_FOCAL_LENGTH = 15.118110236
-
-# Dimensions in use
-FRAME_X = MAC_FRAME_X
-FRAME_Y = MAC_FRAME_Y
-FOV_ANGLE = MAC_FOV_ANGLE
-FOCAL_LENGTH = MAC_FOCAL_LENGTH
+# Axis M1013 dimensions
+FRAME_X = 640
+FRAME_Y = 480
+FOV_ANGLE = 67
+FOCAL_LENGTH = 10.582677165    # 2.80 mm in pixels
 FRAME_CX = FRAME_X / 2
 FRAME_CY = FRAME_Y / 2
 
@@ -49,16 +37,9 @@ CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
-
-def check_modes():
-    """Check which modes are on based on user input."""
-    cal = False
-    track = False
-    if raw_input("Calibration mode on? (y/n)") == "y":
-        cal = True
-    if raw_input("Tracking mode on? (y/n)") == "y":
-        track = True
-    return cal, track
+# Gear dimensions
+MAX_AREA = 2000
+MIN_AREA = 4000
 
 
 def calibration_box(img):
@@ -93,7 +74,7 @@ def draw_static(img):
 def polygon(c):
     """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
-    epsilon = 0.025 * cv2.arcLength(hull, True)
+    epsilon = 0 * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
@@ -110,12 +91,17 @@ def calc_horiz_angle(error):
     return math.atan(error / FOCAL_LENGTH)
 
 
-def is_aligned(error):
+def is_aligned(angle_to_turn):
     """Check if shooter is aligned and ready to shoot."""
-    if 1 > error > -1:
+    if 1 > angle_to_turn > -1:
         return True
     else:
         return False
+
+
+def average(x1, x2):
+    """"Take average of 2 numbers"""
+    return (x1 + x2) / 2
 
 
 def report_command(error):
@@ -146,43 +132,33 @@ def main():
     cal_mode_on = CAL_MODE_ON
     track_mode_on = TRACK_MODE_ON
 
+    shooting = SHOOTING
+    gears = GEARS
+
     # turn on modes specified by user
     # comment out next line if this feature is not desired
-    cal_mode_on, track_mode_on = check_modes()
+    cal_mode_on, track_mode_on, shooting, gears = check_modes()
 
     # network table setup
     NetworkTable.setIPAddress("127.0.0.1")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
-    SmartDashboard = NetworkTable.getTable("SmartDashboard")
+    SmartDashboard = NetworkTable.getTable("NerdyVision")
 
-    # adjust camera settings
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
-    # cap.set(cv2.CAP_PROP_FPS,30)
-    cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
-
-    # set up FPS list and iterator
-    times = [0] * 25
-    time_idx = 0
-    time_start = time.time()
-    camfps = 0
+    # stream from axis camera setup
+    stream = urllib.urlopen('http://10.06.87.11/mjpg/video.mjpg')
+    bytes = ''
 
     while 687:
-        ret, frame = cap.read()
+        # get frame from stream
+        bytes += stream.read(16384)
+        b = bytes.rfind('\xff\xd9')
+        a = bytes.rfind('\xff\xd8', 0, b-1)
 
-        # compute FPS information
-        time_end = time.time()
-        times[time_idx] = time_end - time_start
-        time_idx += 1
-        if time_idx >= len(times):
-            camfps = 1 / (sum(times) / len(times))
-            time_idx = 0
-        if time_idx > 0 and time_idx % 5 == 0:
-            camfps = 1 / (sum(times) / len(times))
-        time_start = time_end
-        print("FPS: " + str(camfps))
-        print("Time: " + str(time.time()))
+        if a != -1 and b != -1:
+            jpg = bytes[a:b+2]
+            bytes = bytes[b+2:]
+            frame = cv2.imdecode(np.fromstring(jpg, dtype = np.uint8), cv2.CV_LOAD_IMAGE_COLOR)
 
         # calibration
         if cal_mode_on:
@@ -190,7 +166,7 @@ def main():
             cv2.imshow("NerdyCalibration", frame)
 
         # tracking
-        if track_mode_on:
+        elif track_mode_on:
             # init values (for x)
             angle_to_turn = 0
             aligned = False
@@ -209,23 +185,59 @@ def main():
                                     cv2.CHAIN_APPROX_SIMPLE)[-2]
             center = None
 
-            # only proceed if at least one contour was found
-            if len(cnts) > 0:
-                # find the largest contour (closest goal) in the mask
-                c = max(cnts, key=cv2.contourArea)
+            if shooting:
+                # only proceed if at least one contour was found
+                if len(cnts) > 0:
+                    # find the largest contour (closest goal) in the mask
+                    c = max(cnts, key=cv2.contourArea)
 
-                # make sure the largest contour is significant
-                area = cv2.contourArea(c)
-                if area > 1500:
-                    # make suggested contour into a polygon
+                    # make sure the largest contour is significant
+                    area = cv2.contourArea(c)
+
                     goal = polygon(c)
 
-                    # make sure goal contour has 4 sides
-                    if len(goal) == 4:
-                        # draw the contour
-                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    # draw the contour
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                        # calculate centroid
+                    # calculate centroid
+                    M = cv2.moments(goal)
+                    if M['m00'] > 0:
+                        cx, cy = calc_center(M)
+                        center = (cx, cy)
+
+                        # draw centroid
+                        cv2.circle(res, center, 5, (255, 0, 0), -1)
+
+                        # calculate error in degrees
+                        error = cx - FRAME_CX
+                        angle_to_turn = calc_horiz_angle(error)
+                        print("Angle to turn: " + str(angle_to_turn))
+
+                        # check if shooter is aligned
+                        aligned = is_aligned(angle_to_turn)
+                        print("Aligned: " + str(aligned))
+
+                        report_command(error)
+                        report_y(cy)
+
+            elif gears:
+                # only proceed if at least two contours (two blocks around peg) was found
+                if len(cnts) > 1:
+                    goals = [0]
+                    # find the two blocks in the mask based on areas
+                    for c in cnts:
+                        area = cv2.contourArea(c)
+                        if MIN_AREA < area < MAX_AREA:
+                            goals.append(c)
+
+                    # draw the contours
+                    cv2.drawContours(res, [goals], 0, (255, 0, 0), 5)
+
+                    centers_x = [0]
+                    centers_y = [0]
+
+                    # calculate centroids of two separate contours
+                    for goal in goals:
                         M = cv2.moments(goal)
                         if M['m00'] > 0:
                             cx, cy = calc_center(M)
@@ -234,16 +246,26 @@ def main():
                             # draw centroid
                             cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            # calculate error in degrees
-                            error = cx - FRAME_CX
-                            angle_to_turn = calc_horiz_angle(error)
-                            print("Angle to turn: " + str(angle_to_turn))
+                            centers_x.append(cx)
+                            centers_y.append(cy)
 
-                            # check if shooter is aligned
-                            aligned = is_aligned(angle_to_turn)
-                            print("Aligned: " + str(aligned))
+                    # calculate center of two contours (blocks next to peg)
+                    if centers_x.len() == 2 && centers_y.len() == 2:
+                        target_x = average((centers_x[0] + centers_x[1])/2)
+                        target_y = average((centers_y[0] + centers_y[1])/2)
+                        cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
 
-                            report_command(error)
+                        # calculate angle to turn
+                        error = target_x - FRAME_CX
+                        angle_to_turn = calc_horiz_angle(error)
+                        print("Angle to turn: " + str(angle_to_turn))
+
+                        # check if gear mechanism is aligned
+                        aligned = is_aligned(angle_to_turn)
+                        print("Aligned: " + str(aligned))
+
+                        report_command(error)
+                        report_y(target_y)
 
             # results
             cv2.imshow("NerdyVision", res)
