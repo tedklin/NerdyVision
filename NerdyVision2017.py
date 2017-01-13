@@ -20,8 +20,8 @@ SHOOTING = True
 GEARS = False
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([70, 20, 20])
-UPPER_GREEN = np.array([90, 230, 230])
+LOWER_GREEN = np.array([30, 20, 20])
+UPPER_GREEN = np.array([70, 230, 230])
 
 # Set HSV range
 LOWER_LIM = LOWER_GREEN
@@ -52,8 +52,8 @@ CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
 # Gear dimensions
-MAX_AREA = 2000
-MIN_AREA = 4000
+MIN_AREA = 10000
+MAX_AREA = 50000
 
 
 def check_modes():
@@ -102,10 +102,10 @@ def draw_static(img):
              (0, 0, 255), 2)
 
 
-def polygon(c):
+def polygon(c, epsil):
     """Remove concavities from a contour and turn it into a polygon."""
     hull = cv2.convexHull(c)
-    epsilon = 0 * cv2.arcLength(hull, True)
+    epsilon = epsil * cv2.arcLength(hull, True)
     goal = cv2.approxPolyDP(hull, epsilon, True)
     return goal
 
@@ -130,9 +130,10 @@ def is_aligned(angle_to_turn):
         return False
 
 
-def average(x1, x2):
+def avg(x1, x2):
     """"Take average of 2 numbers"""
-    return (x1 + x2) / 2
+    sum = x1 + x2
+    return sum / 2
 
 
 def report_command(error):
@@ -191,6 +192,7 @@ def main():
     while 687:
         ret, frame = cap.read()
 
+        '''
         # compute FPS information
         time_end = time.time()
         times[time_idx] = time_end - time_start
@@ -203,6 +205,7 @@ def main():
         time_start = time_end
         print("FPS: " + str(camfps))
         print("Time: " + str(time.time()))
+        '''
 
         # calibration
         if cal_mode_on:
@@ -225,8 +228,8 @@ def main():
             draw_static(res)
 
             # find contour of goal
-            cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                                    cv2.CHAIN_APPROX_SIMPLE)[-2]
+            _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+                                    cv2.CHAIN_APPROX_SIMPLE)
             center = None
 
             if shooting:
@@ -238,50 +241,13 @@ def main():
                     # make sure the largest contour is significant
                     area = cv2.contourArea(c)
 
-                    goal = polygon(c)
+                    if area > 500:
+                        goal = polygon(c, 0)
 
-                    # draw the contour
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                        # draw the contour
+                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                    # calculate centroid
-                    M = cv2.moments(goal)
-                    if M['m00'] > 0:
-                        cx, cy = calc_center(M)
-                        center = (cx, cy)
-
-                        # draw centroid
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
-
-                        # calculate error in degrees
-                        error = cx - FRAME_CX
-                        angle_to_turn = calc_horiz_angle(error)
-                        print("Angle to turn: " + str(angle_to_turn))
-
-                        # check if shooter is aligned
-                        aligned = is_aligned(angle_to_turn)
-                        print("Aligned: " + str(aligned))
-
-                        report_command(error)
-                        report_y(cy)
-
-            elif gears:
-                # only proceed if at least two contours (two blocks around peg) was found
-                if len(cnts) > 1:
-                    goals = [0]
-                    # find the two blocks in the mask based on areas
-                    for c in cnts:
-                        area = cv2.contourArea(c)
-                        if MIN_AREA < area < MAX_AREA:
-                            goals.append(c)
-
-                    # draw the contours
-                    cv2.drawContours(res, [goals], 0, (255, 0, 0), 5)
-
-                    centers_x = [0]
-                    centers_y = [0]
-
-                    # calculate centroids of two separate contours
-                    for goal in goals:
+                        # calculate centroid
                         M = cv2.moments(goal)
                         if M['m00'] > 0:
                             cx, cy = calc_center(M)
@@ -290,14 +256,53 @@ def main():
                             # draw centroid
                             cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            centers_x.append(cx)
-                            centers_y.append(cy)
+                            # calculate error in degrees
+                            error = cx - FRAME_CX
+                            angle_to_turn = calc_horiz_angle(error)
+                            print("Angle to turn: " + str(angle_to_turn))
+
+                            # check if shooter is aligned
+                            aligned = is_aligned(angle_to_turn)
+                            print("Aligned: " + str(aligned))
+
+                            report_command(error)
+                            report_y(cy)
+
+            elif gears:
+                # only proceed if at least two contours (two blocks around peg) was found
+                if len(cnts) > 1:
+                    centers_x = [0]
+                    centers_y = [0]
+
+                    # find the two blocks in the mask based on areas
+                    for i in range(len(cnts)):
+                        c = cnts[i]
+                        area = cv2.contourArea(c)
+                        if MIN_AREA < area < MAX_AREA:
+                            goal = polygon(c, 0.02)
+
+                            # draw the contour
+                            cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+
+                            M = cv2.moments(goal)
+                            if M['m00'] > 0:
+                                cx, cy = calc_center(M)
+                                center = (cx, cy)
+
+                                # draw centroid
+                                cv2.circle(res, center, 5, (255, 0, 0), -1)
+
+                                centers_x.append(cx)
+                                centers_y.append(cy)
 
                     # calculate center of two contours (blocks next to peg)
-                    if centers_x.len() == 2 and centers_y.len() == 2:
-                        target_x = average((centers_x[0] + centers_x[1])/2)
-                        target_y = average((centers_y[0] + centers_y[1])/2)
-                        cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
+                    if len(centers_x) == 3 and len(centers_y) == 3:
+                        target_x = avg(centers_x[1], centers_x[2])
+                        target_y = avg(centers_y[1], centers_y[2])
+                        target = (target_x, target_y)
+                        cv2.circle(res, target, 5, (0, 255, 0), -1)
+                        print(target_x)
+                        print(target_y)
 
                         # calculate angle to turn
                         error = target_x - FRAME_CX
@@ -309,7 +314,6 @@ def main():
                         print("Aligned: " + str(aligned))
 
                         report_command(error)
-                        report_y(target_y)
 
             # results
             cv2.imshow("NerdyVision", res)

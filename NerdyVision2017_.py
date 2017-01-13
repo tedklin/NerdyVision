@@ -99,7 +99,7 @@ def is_aligned(angle_to_turn):
         return False
 
 
-def average(x1, x2):
+def avg(x1, x2):
     """"Take average of 2 numbers"""
     return (x1 + x2) / 2
 
@@ -194,7 +194,7 @@ def main():
                     # make sure the largest contour is significant
                     area = cv2.contourArea(c)
 
-                    goal = polygon(c)
+                    goal = polygon(c, 0)
 
                     # draw the contour
                     cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
@@ -223,37 +223,36 @@ def main():
             elif gears:
                 # only proceed if at least two contours (two blocks around peg) was found
                 if len(cnts) > 1:
-                    goals = [0]
-                    # find the two blocks in the mask based on areas
-                    for c in cnts:
-                        area = cv2.contourArea(c)
-                        if MIN_AREA < area < MAX_AREA:
-                            goals.append(c)
-
-                    # draw the contours
-                    cv2.drawContours(res, [goals], 0, (255, 0, 0), 5)
-
                     centers_x = [0]
                     centers_y = [0]
 
-                    # calculate centroids of two separate contours
-                    for goal in goals:
-                        M = cv2.moments(goal)
-                        if M['m00'] > 0:
-                            cx, cy = calc_center(M)
-                            center = (cx, cy)
+                    # find the two blocks in the mask based on areas
+                    for i in range(len(cnts)):
+                        c = cnts[i]
+                        area = cv2.contourArea(c)
+                        if MIN_AREA < area < MAX_AREA:
+                            goal = polygon(c, 0.02)
 
-                            # draw centroid
-                            cv2.circle(res, center, 5, (255, 0, 0), -1)
+                            # draw the contour
+                            cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                            centers_x.append(cx)
-                            centers_y.append(cy)
+                            M = cv2.moments(goal)
+                            if M['m00'] > 0:
+                                cx, cy = calc_center(M)
+                                center = (cx, cy)
+
+                                # draw centroid
+                                cv2.circle(res, center, 5, (255, 0, 0), -1)
+
+                                centers_x.append(cx)
+                                centers_y.append(cy)
 
                     # calculate center of two contours (blocks next to peg)
-                    if centers_x.len() == 2 and centers_y.len() == 2:
-                        target_x = average((centers_x[0] + centers_x[1])/2)
-                        target_y = average((centers_y[0] + centers_y[1])/2)
-                        cv2.circle(res, (target_x, target_y), (0, 255, 0), -1)
+                    if len(centers_x) == 3 and len(centers_y) == 3:
+                        target_x = avg(centers_x[1], centers_x[2])
+                        target_y = avg(centers_y[1], centers_y[2])
+                        target = (target_x, target_y)
+                        cv2.circle(res, target, 5, (0, 255, 0), -1)
 
                         # calculate angle to turn
                         error = target_x - FRAME_CX
@@ -265,7 +264,6 @@ def main():
                         print("Aligned: " + str(aligned))
 
                         report_command(error)
-                        report_y(target_y)
 
             # results
             cv2.imshow("NerdyVision", res)
