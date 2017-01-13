@@ -38,8 +38,8 @@ CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
 # Gear dimensions
-MAX_AREA = 2000
-MIN_AREA = 4000
+MIN_AREA = 25000
+MAX_AREA = 75000
 
 
 def calibration_box(img):
@@ -134,10 +134,6 @@ def main():
 
     shooting = SHOOTING
     gears = GEARS
-
-    # turn on modes specified by user
-    # comment out next line if this feature is not desired
-    cal_mode_on, track_mode_on, shooting, gears = check_modes()
 
     # network table setup
     NetworkTable.setIPAddress("127.0.0.1")

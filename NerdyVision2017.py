@@ -52,8 +52,8 @@ CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
 # Gear dimensions
-MIN_AREA = 10000
-MAX_AREA = 50000
+MIN_AREA = 25000
+MAX_AREA = 75000
 
 
 def check_modes():
