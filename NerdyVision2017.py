@@ -7,11 +7,11 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-"""2017 FRC Vision testing on laptop with webcam"""
+"""2017 FRC Vision testing on laptop with Microsoft Lifecam"""
 __author__ = "tedfoodlin"
 
 # Capture video from camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Set modes (if you don't want user input)
 CAL_MODE_ON = False
@@ -20,26 +20,20 @@ SHOOTING = True
 GEARS = False
 
 # HSV range values for different colors
-LOWER_GREEN = np.array([30, 20, 20])
-UPPER_GREEN = np.array([70, 230, 230])
+LOWER_GREEN = np.array([40, 50, 50])
+UPPER_GREEN = np.array([60, 250, 300])
 
 # Set HSV range
 LOWER_LIM = LOWER_GREEN
 UPPER_LIM = UPPER_GREEN
 
-# Mac webcam dimensions (approx)
-MAC_FRAME_X = 1280
-MAC_FRAME_Y = 720
-MAC_FOV_ANGLE = 60
-MAC_FOCAL_LENGTH = 15.118110236
-
-# Dimensions in use
-FRAME_X = MAC_FRAME_X
-FRAME_Y = MAC_FRAME_Y
-FOV_ANGLE = MAC_FOV_ANGLE
-FOCAL_LENGTH = MAC_FOCAL_LENGTH
-FRAME_CX = FRAME_X / 2
-FRAME_CY = FRAME_Y / 2
+# Dimensions in use (Microsoft Lifecam HD-3000)
+FRAME_X = 640
+FRAME_Y = 480
+FOV_ANGLE = 59.02039664
+DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
+FRAME_CX = 320
+FRAME_CY = 240
 
 # Calibration box dimensions
 CAL_AREA = 1600
@@ -94,9 +88,6 @@ def masking(lower, upper, frame):
 
 def draw_static(img):
     """Draw references on frame."""
-    # draw center of frame
-    cv2.circle(img, (FRAME_CX, FRAME_CY), 5,
-               (0, 0, 255), -1)
     # draw reference line for x position
     cv2.line(img, (FRAME_CX, 0), (FRAME_CX, FRAME_Y),
              (0, 0, 255), 2)
@@ -119,7 +110,7 @@ def calc_center(M):
 
 def calc_horiz_angle(error):
     """Calculates the horizontal angle from pixel error"""
-    return math.atan(error / FOCAL_LENGTH)
+    return error * DEGREES_PER_PIXEL
 
 
 def is_aligned(angle_to_turn):
@@ -169,10 +160,10 @@ def main():
 
     # turn on modes specified by user
     # comment out next line if this feature is not desired
-    cal_mode_on, track_mode_on, shooting, gears = check_modes()
+#    cal_mode_on, track_mode_on, shooting, gears = check_modes()
 
     # network table setup
-    NetworkTable.setIPAddress("127.0.0.1")
+    NetworkTable.setIPAddress("roboRIO-687-FRC.local")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     SmartDashboard = NetworkTable.getTable("NerdyVision")

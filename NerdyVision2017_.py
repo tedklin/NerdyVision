@@ -136,7 +136,7 @@ def main():
     gears = GEARS
 
     # network table setup
-    NetworkTable.setIPAddress("127.0.0.1")
+    NetworkTable.setIPAddress("roboRIO-687-FRC.local")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     SmartDashboard = NetworkTable.getTable("NerdyVision")
