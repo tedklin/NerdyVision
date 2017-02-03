@@ -6,12 +6,28 @@ import time
 from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from SocketServer import ThreadingMixIn
 
 """2017 FRC Vision testing on laptop with Microsoft Lifecam"""
 __author__ = "tedfoodlin"
 
-# Capture video from camera
-cap = cv2.VideoCapture(1)
+# Capture video from camera (0 for laptop webcam, 1 for USB camera)
+cap = cv2.VideoCapture(0)
+
+# for mjpeg
+streamPort = 1185
+
+# for sample image testing (images from 1 to 32)
+sample_image = 27
+
+# HSV range values for testing sample images
+SAMPLE_LOWER = np.array([80, 70, 80])
+SAMPLE_UPPER = np.array([100, 300, 300])
+
+# HSV range values for green highlighter
+LOWER_GREEN = np.array([40, 50, 50])
+UPPER_GREEN = np.array([60, 250, 300])
 
 # Set modes (if you don't want user input)
 CAL_MODE_ON = False
@@ -19,13 +35,9 @@ TRACK_MODE_ON = True
 SHOOTING = True
 GEARS = False
 
-# HSV range values for different colors
-LOWER_GREEN = np.array([40, 50, 50])
-UPPER_GREEN = np.array([60, 250, 300])
-
 # Set HSV range
-LOWER_LIM = LOWER_GREEN
-UPPER_LIM = UPPER_GREEN
+LOWER_LIM = SAMPLE_LOWER
+UPPER_LIM = SAMPLE_UPPER
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 640
@@ -160,7 +172,7 @@ def main():
 
     # turn on modes specified by user
     # comment out next line if this feature is not desired
-#    cal_mode_on, track_mode_on, shooting, gears = check_modes()
+    # cal_mode_on, track_mode_on, shooting, gears = check_modes()
 
     # network table setup
     NetworkTable.setIPAddress("roboRIO-687-FRC.local")
@@ -183,6 +195,10 @@ def main():
     while 687:
         ret, frame = cap.read()
 
+        # the next 2 lines are for sample image testing for shooting
+        # frame = cv2.imread("sample_images/LED_Boiler/" + str(sample_image) + ".jpg")
+        # print(sample_image)
+
         '''
         # compute FPS information
         time_end = time.time()
@@ -195,7 +211,7 @@ def main():
             camfps = 1 / (sum(times) / len(times))
         time_start = time_end
         print("FPS: " + str(camfps))
-        print("Time: " + str(time.time()))
+        print("Time: "   + str(time.time()))
         '''
 
         # calibration
@@ -232,7 +248,7 @@ def main():
                     # make sure the largest contour is significant
                     area = cv2.contourArea(c)
 
-                    if area > 500:
+                    if area > 300:
                         goal = polygon(c, 0)
 
                         # draw the contour
@@ -250,11 +266,11 @@ def main():
                             # calculate error in degrees
                             error = cx - FRAME_CX
                             angle_to_turn = calc_horiz_angle(error)
-                            print("Angle to turn: " + str(angle_to_turn))
+                            print("ANGLE TO TURN " + str(angle_to_turn))
 
                             # check if shooter is aligned
                             aligned = is_aligned(angle_to_turn)
-                            print("Aligned: " + str(aligned))
+                            print("ALIGNED " + str(aligned))
 
                             report_command(error)
                             report_y(cy)
@@ -298,28 +314,24 @@ def main():
                         # calculate angle to turn
                         error = target_x - FRAME_CX
                         angle_to_turn = calc_horiz_angle(error)
-                        print("Angle to turn: " + str(angle_to_turn))
+                        print("ANGLE TO TURN " + str(angle_to_turn))
 
                         # check if gear mechanism is aligned
                         aligned = is_aligned(angle_to_turn)
-                        print("Aligned: " + str(aligned))
+                        print("ALIGNED " + str(aligned))
 
                         report_command(error)
 
             # results
             cv2.imshow("NerdyVision", res)
+
             try:
                 # send to network tables
                 SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
                 SmartDashboard.putBoolean('IS_ALIGNED', aligned)
+                print("DATA SENDING")
             except:
                 print("DATA NOT SENDING...")
-
-        # capture a keypress
-        key = cv2.waitKey(20) & 0xFF
-        # escape key
-        if key == 27:
-            break
 
     cap.release()
     cv2.destroyAllWindows()
