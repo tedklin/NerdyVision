@@ -9,10 +9,6 @@ logging.basicConfig(level=logging.DEBUG)
 """2016 FRC Vision Processing on Driver Station with Axis"""
 __author__ = "tedfoodlin"
 
-# Default modes
-CAL_MODE_ON = False
-TRACK_MODE_ON = True
-
 # HSV range values for green
 LOWER_LIM = np.array([40, 20, 20])
 UPPER_LIM = np.array([80, 220, 220])
@@ -24,27 +20,6 @@ FOV_ANGLE = 67
 FOCAL_LENGTH = 10.582677165    # 2.80 mm in pixels
 FRAME_CX = FRAME_X / 2
 FRAME_CY = FRAME_Y / 2
-
-# Calibration box dimensions
-CAL_AREA = 1600
-CAL_SIZE = int(math.sqrt(CAL_AREA))
-CAL_UP = FRAME_CY + (CAL_SIZE / 2)
-CAL_LO = FRAME_CY - (CAL_SIZE / 2)
-CAL_R = FRAME_CX - (CAL_SIZE / 2)
-CAL_L = FRAME_CX + (CAL_SIZE / 2)
-CAL_UL = (CAL_L, CAL_UP)
-CAL_LR = (CAL_R, CAL_LO)
-
-
-def calibration_box(img):
-    """Return HSV color in the calibration box."""
-    cv2.rectangle(img, CAL_UL, CAL_LR, (0, 255, 0), thickness=1)
-    roi = img[CAL_LO:CAL_UP, CAL_R:CAL_L]
-    average_color_per_row = np.average(roi, axis=0)
-    average_color = np.average(average_color_per_row, axis=0)
-    average_color = np.uint8([[average_color]])
-    hsv = cv2.cvtColor(average_color, cv2.COLOR_BGR2HSV)
-    return hsv
 
 
 def masking(lower, upper, frame):
@@ -140,75 +115,68 @@ def main():
             bytes = bytes[b+2:]
             frame = cv2.imdecode(np.fromstring(jpg, dtype = np.uint8), cv2.CV_LOAD_IMAGE_COLOR)
 
-        # calibration
-        if CAL_MODE_ON:
-            print(np.array_str(calibration_box(frame)))
-            cv2.imshow("NerdyCalibration", frame)
+        # init values (for x)
+        angle_to_turn = 0
+        aligned = False
 
-        # tracking
-        if TRACK_MODE_ON:
-            # init values (for x)
-            angle_to_turn = 0
-            aligned = False
+        # gaussian blur to remove noise
+        blur = cv2.GaussianBlur(frame, (11, 11), 0)
 
-            # gaussian blur to remove noise
-            blur = cv2.GaussianBlur(frame, (11, 11), 0)
+        # remove everything but specified color
+        res, mask = masking(LOWER_LIM, UPPER_LIM, blur)
 
-            # remove everything but specified color
-            res, mask = masking(LOWER_LIM, UPPER_LIM, blur)
+        # draw references
+        draw_static(res)
 
-            # draw references
-            draw_static(res)
+        # find contours
+        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+                                cv2.CHAIN_APPROX_SIMPLE)[-2]
+        center = None
 
-            # find contours
-            cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                                    cv2.CHAIN_APPROX_SIMPLE)[-2]
-            center = None
+        # only proceed if at least one contour was found
+        if len(cnts) > 0:
+            # find the largest contour (closest goal) in the mask
+            c = max(cnts, key=cv2.contourArea)
 
-            # only proceed if at least one contour was found
-            if len(cnts) > 0:
-                # find the largest contour (closest goal) in the mask
-                c = max(cnts, key=cv2.contourArea)
+            # make sure the largest contour is significant
+            area = cv2.contourArea(c)
 
-                # make sure the largest contour is significant
-                area = cv2.contourArea(c)
+        if area > 1500:
+            # make suggested contour into a polygon
+            goal = polygon(c)
 
-            if area > 1500:
-                # make suggested contour into a polygon
-                goal = polygon(c)
+        # make sure goal contour has 4 sides
+        if len(goal) == 4:
+            # draw the contour
+            cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-            # make sure goal contour has 4 sides
-            if len(goal) == 4:
-                # draw the contour
-                cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+            # calculate centroid
+            M = cv2.moments(goal)
 
-                # calculate centroid
-                M = cv2.moments(goal)
+        if M['m00'] > 0:
+            cx, cy = calc_center(M)
+            center = (cx, cy)
 
-            if M['m00'] > 0:
-                cx, cy = calc_center(M)
-                center = (cx, cy)
+            # draw centroid
+            cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                # draw centroid
-                cv2.circle(res, center, 5, (255, 0, 0), -1)
+            # calculate error in degrees
+            error = cx - FRAME_CX
+            angle_to_turn = calc_horiz_angle(error)
+            print("ANGLE_TO_TURN" + str(angle_to_turn))
 
-                # calculate error in degrees
-                error = cx - FRAME_CX
-                angle_to_turn = calc_horiz_angle(error)
-                print("ANGLE_TO_TURN" + str(angle_to_turn))
+            # check if shooter is aligned
+            aligned = is_aligned(angle_to_turn)
+            print("IS_ALIGNED: " + str(aligned))
 
-                # check if shooter is aligned
-                aligned = is_aligned(angle_to_turn)
-                print("IS_ALIGNED: " + str(aligned))
-
-            # results
-            cv2.imshow("NerdyVision", res)
-            try:
-                # send data to network tables
-                table.putNumber('ANGLE_TO_TURN', angle_to_turn)
-                table.putBoolean('IS_ALIGNED', aligned)
-            except:
-                print("DATA NOT SENDING...")
+        # results
+        cv2.imshow("NerdyVision", res)
+        try:
+            # send data to network tables
+            table.putNumber('ANGLE_TO_TURN', angle_to_turn)
+            table.putBoolean('IS_ALIGNED', aligned)
+        except:
+            print("DATA NOT SENDING...")
 
 
 if __name__ == '__main__':
