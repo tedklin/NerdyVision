@@ -6,7 +6,7 @@ import math
 __author__ = "tedfoodlin"
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 640

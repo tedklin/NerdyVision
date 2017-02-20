@@ -13,7 +13,7 @@ from SocketServer import ThreadingMixIn
 __author__ = "tedfoodlin"
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # for mjpeg
 streamPort = 1185
@@ -34,8 +34,8 @@ SHOOTING = True
 GEARS = False
 
 # Set HSV range
-LOWER_LIM = SAMPLE_LOWER
-UPPER_LIM = SAMPLE_UPPER
+LOWER_LIM = LOWER_GREEN
+UPPER_LIM = UPPER_GREEN
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 640
@@ -139,7 +139,7 @@ def main():
     gears = GEARS
 
     # turn on modes specified by user
-    # comment out next line if this feature is not desired
+    # uncomment next line if this feature is desired
     # shooting, gears = check_modes()
 
     # network table setup
@@ -151,7 +151,7 @@ def main():
     # adjust camera settings
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
-    # cap.set(cv2.CAP_PROP_FPS,30)
+    # cap.set(cv2.CAP_PROP_FPS, 30)
     cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
     # set up FPS list and iterator
@@ -164,8 +164,8 @@ def main():
         ret, frame = cap.read()
 
         # the next 2 lines are for sample image testing for shooting
-        frame = cv2.imread("sample_images/LED_Boiler/" + str(sample_image) + ".jpg")
-        print(sample_image)
+        #frame = cv2.imread("sample_images/LED_Boiler/" + str(sample_image) + ".jpg")
+        #print(sample_image)
 
         '''
         # compute FPS information
