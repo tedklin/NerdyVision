@@ -8,7 +8,7 @@ Python 2.7, NumPy and OpenCV
 
 [PyNetworkTables](https://github.com/robotpy/pynetworktables)
 
-Camera (code for Axis M1013 Network Camera or Microsoft Lifecam HD-3000 is included)
+Axis M1013 Network Camera or Raspberry Pi compatible USB camera (Microsoft Lifecam HD-3000 used in this project)
 
 [Food](https://www.google.com/#q=food)
 

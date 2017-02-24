@@ -4,6 +4,9 @@ from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+"""2017 FRC Gear Vision Targeting on Raspberry Pi with Microsoft Lifecam"""
+__author__ = "tedfoodlin"
+
 cap = cv2.VideoCapture(0)
 
 FRAME_X = 640
