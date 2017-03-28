@@ -13,7 +13,6 @@ FRAME_Y = 240
 FRAME_CX = int(FRAME_X/2)
 FRAME_CY = int(FRAME_Y/2)
 
-# adjust camera settings
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
 
@@ -24,4 +23,4 @@ while 687:
     cv2.line(frame, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (0, 255, 0), 3)
     cv2.imwrite("/tmp/stream/img.jpg", frame)
 
-    cv2.waitKey(0)
+    cv2.waitKey(1)

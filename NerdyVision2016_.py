@@ -142,7 +142,7 @@ def main():
         except:
             print("DATA NOT SENDING...")
 
-        cv2.waitKey(1)
+        cv2.waitKey(0)
 
     cap.release()
     cv2.destroyAllWindows()

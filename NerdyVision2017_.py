@@ -97,7 +97,7 @@ while 687:
         print("DATA NOT SENDING...")
 
     cv2.imshow("NerdyVision", res)
-    cv2.waitKey(1)
+    cv2.waitKey(0)
 
 cap.release()
 cv2.destroyAllWindows()
