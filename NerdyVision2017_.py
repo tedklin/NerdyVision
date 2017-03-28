@@ -1,13 +1,17 @@
 import cv2
 import numpy as np
 from networktables import NetworkTable
+import os
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Gear Vision Targeting on Raspberry Pi with Microsoft Lifecam"""
 __author__ = "tedfoodlin"
 
-cap = cv2.VideoCapture(0)
+if not os.path.isdir("/tmp/stream"):
+   os.makedirs("/tmp/stream")
+
+cap = cv2.VideoCapture(-1)
 
 FRAME_X = 640
 FRAME_Y = 480
@@ -84,6 +88,7 @@ while 687:
             angle_to_turn = error * DEGREES_PER_PIXEL
             aligned = 1 > angle_to_turn > -1
 
+    cv2.imwrite("/tmp/stream/img.jpg", frame)
     try:
         SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
         SmartDashboard.putBoolean('IS_ALIGNED', aligned)

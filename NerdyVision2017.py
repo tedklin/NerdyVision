@@ -13,7 +13,7 @@ from SocketServer import ThreadingMixIn
 __author__ = "tedfoodlin"
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(-1)
 
 # for mjpeg
 streamPort = 1185

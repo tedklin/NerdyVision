@@ -1,12 +1,16 @@
 import cv2
 import numpy as np
 import math
+import os
 
 """FRC Vision Target Calibration"""
 __author__ = "tedfoodlin"
 
+if not os.path.isdir("/tmp/stream"):
+   os.makedirs("/tmp/stream")
+
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(-1)
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 640
@@ -40,6 +44,7 @@ def main():
 
         print(np.array_str(hsv))
         cv2.imshow("NerdyCalibration", frame)
+        cv2.imwrite("/tmp/stream/img.jpg", frame)
 
     cap.release()
     cv2.destroyAllWindows()

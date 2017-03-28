@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 __author__ = "tedfoodlin"
 
 # Capture video from camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(-1)
 
 # HSV range values for different colors
 LOWER_GREEN = np.array([40, 20, 20])
@@ -204,15 +204,10 @@ def main():
         except:
             print("DATA NOT SENDING...")
 
-        # capture a keypress
-        key = cv2.waitKey(20) & 0xFF
-        # escape key
-        if key == 27:
-            break
+        cv2.waitKey(1)
 
     cap.release()
     cv2.destroyAllWindows()
-
 
 if __name__ == '__main__':
     main()
