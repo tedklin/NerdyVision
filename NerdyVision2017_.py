@@ -15,12 +15,12 @@ cap = cv2.VideoCapture(-1)
 
 FRAME_X = 640
 FRAME_Y = 480
-
 FRAME_CX = int(FRAME_X/2)
 FRAME_CY = int(FRAME_Y/2)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
+cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
@@ -47,7 +47,7 @@ while 687:
                        np.array([60, 250, 300]))
     res = cv2.bitwise_and(frame, frame, mask=mask)
 
-    _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                   cv2.CHAIN_APPROX_SIMPLE)
     center = None
 
@@ -88,7 +88,7 @@ while 687:
             angle_to_turn = error * DEGREES_PER_PIXEL
             aligned = 1 > angle_to_turn > -1
 
-    cv2.imwrite("/tmp/stream/img.jpg", frame)
+    cv2.imshow("NerdyVision", res)
     try:
         SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
         SmartDashboard.putBoolean('IS_ALIGNED', aligned)
@@ -98,3 +98,6 @@ while 687:
 
     cv2.imshow("NerdyVision", res)
     cv2.waitKey(1)
+
+cap.release()
+cv2.destroyAllWindows()

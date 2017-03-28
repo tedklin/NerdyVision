@@ -16,12 +16,12 @@ cap = cv2.VideoCapture(-1)
 
 FRAME_X = 640
 FRAME_Y = 480
-
 FRAME_CX = int(FRAME_X/2)
 FRAME_CY = int(FRAME_Y/2)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
+cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
@@ -45,10 +45,8 @@ def masking(lower, upper, frame):
 
 
 def draw_static(img):
-    cv2.circle(img, (FRAME_CX, FRAME_CY), 5,
-               (0, 0, 255), -1)
-    cv2.line(img, (FRAME_CX, 0), (FRAME_CX, FRAME_Y),
-             (0, 0, 255), 2)
+    cv2.line(img, (FRAME_CX, int(0.25*FRAME_Y)), (FRAME_CX, int(0.75*FRAME_Y)), (0, 255, 0), 3)
+    cv2.line(img, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (0, 255, 0), 3)
 
 
 def polygon(c):
@@ -97,13 +95,12 @@ def report_y(cy):
 
 
 def main():
-
     while 687:
-        ret, frame = cap.read()
 
         angle_to_turn = 0
         aligned = False
 
+        ret, frame = cap.read()
         # blur = cv2.GaussianBlur(frame, (11, 11), 0)
         kernel = np.ones((5, 5), np.uint8)
         erosion = cv2.erode(frame, kernel, iterations=1)
@@ -111,6 +108,7 @@ def main():
         res, mask = masking(LOWER_LIM, UPPER_LIM, dilation)
 
         draw_static(res)
+        cv2.imwrite("/tmp/stream/img.jpg", res)
 
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -138,7 +136,6 @@ def main():
                         print("IS_ALIGNED: " + str(aligned))
 
         cv2.imshow("NerdyVision", res)
-        cv2.imwrite("/tmp/stream/img.jpg", res)
         try:
             SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
             SmartDashboard.putBoolean('IS_ALIGNED', aligned)
@@ -146,6 +143,9 @@ def main():
             print("DATA NOT SENDING...")
 
         cv2.waitKey(1)
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':

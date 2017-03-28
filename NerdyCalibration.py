@@ -17,8 +17,8 @@ FRAME_X = 640
 FRAME_Y = 480
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
-FRAME_CX = 320
-FRAME_CY = 240
+FRAME_CX = int(FRAME_X/2)
+FRAME_CY = int(FRAME_Y/2)
 
 # Calibration box dimensions
 CAL_AREA = 1600
@@ -30,6 +30,9 @@ CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
+cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
 def main():
     while 687:

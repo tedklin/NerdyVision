@@ -6,17 +6,12 @@ import time
 from networktables import NetworkTable
 import logging
 logging.basicConfig(level=logging.DEBUG)
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
 
 """2017 FRC Vision testing on laptop with Microsoft Lifecam"""
 __author__ = "tedfoodlin"
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
 cap = cv2.VideoCapture(-1)
-
-# for mjpeg
-streamPort = 1185
 
 # for sample image testing (images from 1 to 32)
 sample_image = 32
@@ -42,8 +37,8 @@ FRAME_X = 640
 FRAME_Y = 480
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
-FRAME_CX = 320
-FRAME_CY = 240
+FRAME_CX = int(FRAME_X/2)
+FRAME_CY = int(FRAME_Y/2)
 
 # Gear dimensions
 MIN_AREA = 15000
@@ -71,9 +66,9 @@ def masking(lower, upper, frame):
 
 def draw_static(img):
     """Draw references on frame."""
-    # draw reference line for x position
-    cv2.line(img, (FRAME_CX, 0), (FRAME_CX, FRAME_Y),
-             (0, 0, 255), 2)
+    # draw reference crosshairs
+    cv2.line(img, (FRAME_CX, int(0.25*FRAME_Y)), (FRAME_CX, int(0.75*FRAME_Y)), (0, 255, 0), 3)
+    cv2.line(img, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (0, 255, 0), 3)
 
 
 def polygon(c, epsil):
@@ -166,21 +161,6 @@ def main():
         # the next 2 lines are for sample image testing for shooting
         #frame = cv2.imread("sample_images/LED_Boiler/" + str(sample_image) + ".jpg")
         #print(sample_image)
-
-        '''
-        # compute FPS information
-        time_end = time.time()
-        times[time_idx] = time_end - time_start
-        time_idx += 1
-        if time_idx >= len(times):
-            camfps = 1 / (sum(times) / len(times))
-            time_idx = 0
-        if time_idx > 0 and time_idx % 5 == 0:
-            camfps = 1 / (sum(times) / len(times))
-        time_start = time_end
-        print("FPS: " + str(camfps))
-        print("Time: "   + str(time.time()))
-        '''
 
         # init values (for x)
         angle_to_turn = 0
@@ -293,6 +273,7 @@ def main():
             print("DATA SENDING")
         except:
             print("DATA NOT SENDING...")
+        cv2.waitKey(1)
 
     cap.release()
     cv2.destroyAllWindows()

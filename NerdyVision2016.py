@@ -32,8 +32,8 @@ FRAME_X = MAC_FRAME_X
 FRAME_Y = MAC_FRAME_Y
 FOV_ANGLE = MAC_FOV_ANGLE
 FOCAL_LENGTH = MAC_FOCAL_LENGTH
-FRAME_CX = FRAME_X / 2
-FRAME_CY = FRAME_Y / 2
+FRAME_CX = int(FRAME_X/2)
+FRAME_CY = int(FRAME_Y/2)
 
 
 def masking(lower, upper, frame):
@@ -46,12 +46,9 @@ def masking(lower, upper, frame):
 
 def draw_static(img):
     """Draw references on frame."""
-    # draw center of frame
-    cv2.circle(img, (FRAME_CX, FRAME_CY), 5,
-               (0, 0, 255), -1)
-    # draw reference line for x position
-    cv2.line(img, (FRAME_CX, 0), (FRAME_CX, FRAME_Y),
-             (0, 0, 255), 2)
+    # draw reference crosshairs
+    cv2.line(img, (FRAME_CX, int(0.25*FRAME_Y)), (FRAME_CX, int(0.75*FRAME_Y)), (0, 255, 0), 3)
+    cv2.line(img, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (0, 255, 0), 3)
 
 
 def polygon(c):
@@ -106,7 +103,6 @@ def report_y(cy):
 
 
 def main():
-
     # network table setup
     NetworkTable.setIPAddress("127.0.0.1")
     NetworkTable.setClientMode()
@@ -203,11 +199,11 @@ def main():
             SmartDashboard.putBoolean('IS_ALIGNED', aligned)
         except:
             print("DATA NOT SENDING...")
-
         cv2.waitKey(1)
 
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()
