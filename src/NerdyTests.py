@@ -46,7 +46,6 @@ def main():
     # adjust camera settings
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
-    # cap.set(cv2.CAP_PROP_FPS, 30)
     cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
     # set up FPS list and iterator

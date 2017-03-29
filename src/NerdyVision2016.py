@@ -15,6 +15,9 @@ if not os.path.isdir("/tmp/stream"):
 
 #cap = WebcamVideoStream(src=-1).start()
 cap = cv2.VideoCapture(-1)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
 
 def main():
@@ -26,16 +29,17 @@ def main():
     print("NetworkTables initialized")
 
     while 687:
-
         angle_to_turn = 0
         aligned = False
 
-        frame = cap.read()
+        #frame = cap.read()
+        ret, frame = cap.read()
+        img = frame.copy()
 
         NerdyFunctions.draw_static(frame)
         cv2.imwrite("/tmp/stream/img.jpg", frame)
 
-        blur = cv2.GaussianBlur(frame, (11, 11), 0)
+        blur = cv2.GaussianBlur(img, (11, 11), 0)
         # kernel = np.ones((5, 5), np.uint8)
         # erosion = cv2.erode(frame, kernel, iterations=1)
         # dilation = cv2.dilate(erosion, kernel, iterations=1)
