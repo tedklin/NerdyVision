@@ -1,13 +1,10 @@
 import logging
 import os
-
 import cv2
 from imutils.video import WebcamVideoStream
 from networktables import NetworkTable
-
 import NerdyConstants
 import NerdyFunctions
-
 logging.basicConfig(level=logging.DEBUG)
 
 """2016 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
@@ -25,6 +22,7 @@ def main():
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     SmartDashboard = NetworkTable.getTable("NerdyVision")
+    print("NetworkTables initialized")
 
     while 687:
 
@@ -33,8 +31,8 @@ def main():
 
         frame = cap.read()
 
-        NerdyFunctions.draw_static(res)
-        cv2.imwrite("/tmp/stream/img.jpg", res)
+        NerdyFunctions.draw_static(frame)
+        cv2.imwrite("/tmp/stream/img.jpg", frame)
 
         blur = cv2.GaussianBlur(frame, (11, 11), 0)
         # kernel = np.ones((5, 5), np.uint8)
@@ -67,6 +65,7 @@ def main():
                         aligned = NerdyFunctions.is_aligned(angle_to_turn)
                         print("IS_ALIGNED: " + str(aligned))
 
+        NerdyFunctions.draw_static(res)
         cv2.imshow("NerdyVision", res)
         try:
             SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)

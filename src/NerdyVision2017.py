@@ -1,12 +1,10 @@
 import logging
 import os
-
 import cv2
+from imutils.video import WebcamVideoStream
 from networktables import NetworkTable
-
 import NerdyConstants
 import NerdyFunctions
-
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
@@ -15,7 +13,7 @@ __author__ = "tedfoodlin"
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
 
-cap = cv2.VideoCapture(-1)
+cap = WebcamVideoStream(src=-1).start()
 
 
 def main():
@@ -24,9 +22,11 @@ def main():
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     SmartDashboard = NetworkTable.getTable("NerdyVision")
+    print("NetworkTables initialized")
 
     while 687:
-        ret, frame = cap.read()
+
+        frame = cap.read()
 
         NerdyFunctions.draw_static(frame)
         cv2.imwrite("/tmp/stream/img.jpg", frame)
@@ -37,8 +37,7 @@ def main():
         # dilation = cv2.dilate(erosion, kernel, iterations=1)
         res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
 
-        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                                      cv2.CHAIN_APPROX_SIMPLE)
+        _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center = None
 
         if len(cnts) > 1:
@@ -76,6 +75,7 @@ def main():
                 angle_to_turn = NerdyFunctions.calc_horiz_angle(error)
                 aligned = 1 > angle_to_turn > -1
 
+        NerdyFunctions.draw_static(res)
         cv2.imshow("NerdyVision", res)
         try:
             SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
@@ -83,8 +83,10 @@ def main():
         except:
             print("DATA NOT SENDING...")
 
-        cv2.imshow("NerdyVision", res)
-        cv2.waitKey(0)
+        cv2.waitKey(1)
 
     cap.release()
     cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()

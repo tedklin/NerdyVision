@@ -1,8 +1,6 @@
 from threading import Thread
-
 import cv2
-
-from src import NerdyConstants
+import NerdyConstants
 
 """USB camera stream class for optimized FPS modified by tedfoodlin"""
 __author__ = "pyimagesearch @http://www.pyimagesearch.com/"

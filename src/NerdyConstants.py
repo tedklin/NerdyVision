@@ -8,8 +8,8 @@ SAMPLE_LOWER = np.array([80, 70, 80])
 SAMPLE_UPPER = np.array([100, 300, 300])
 
 # HSV range values for green
-LOWER_GREEN = np.array([40, 50, 50])
-UPPER_GREEN = np.array([60, 250, 300])
+LOWER_GREEN = np.array([50, 50, 50])
+UPPER_GREEN = np.array([70, 250, 300])
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 640

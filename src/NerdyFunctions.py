@@ -1,5 +1,4 @@
 import cv2
-
 import NerdyConstants
 
 """FRC Image Processing Functions"""

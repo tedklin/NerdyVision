@@ -1,12 +1,9 @@
 import logging
-import time
-
 import cv2
+import time
 from networktables import NetworkTable
-
 import NerdyConstants
 import NerdyFunctions
-
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Vision testing on laptop with Microsoft Lifecam"""
@@ -44,6 +41,7 @@ def main():
     NetworkTable.setClientMode()
     NetworkTable.initialize()
     SmartDashboard = NetworkTable.getTable("NerdyVision")
+    print("NetworkTables initialized")
 
     # adjust camera settings
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
@@ -72,7 +70,7 @@ def main():
         blur = cv2.GaussianBlur(frame, (11, 11), 0)
 
         # remove everything but specified color
-        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_LIM, NerdyConstants.UPPER_LIM, blur)
+        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
 
         # draw references
         NerdyFunctions.draw_static(res)
@@ -128,7 +126,7 @@ def main():
                 for i in range(len(cnts)):
                     c = cnts[i]
                     area = cv2.contourArea(c)
-                    if NerdyConstants.MIN_GEAR_AREAREA < area < NerdyConstants.MAX_GEAR_AREA:
+                    if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
                         goal = NerdyFunctions.polygon(c, 0.02)
 
                         # draw the contour
