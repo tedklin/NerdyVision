@@ -45,8 +45,8 @@ def masking(lower, upper, frame):
 
 
 def draw_static(img):
-    cv2.line(img, (FRAME_CX, int(0.25*FRAME_Y)), (FRAME_CX, int(0.75*FRAME_Y)), (0, 255, 0), 3)
-    cv2.line(img, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (0, 255, 0), 3)
+    cv2.line(img, (FRAME_CX, int(0.25*FRAME_Y)), (FRAME_CX, int(0.75*FRAME_Y)), (255, 0, 0), 3)
+    cv2.line(img, (int(0.25*FRAME_X), FRAME_CY), (int(0.75*FRAME_X), FRAME_CY), (255, 0, 0), 3)
 
 
 def polygon(c):

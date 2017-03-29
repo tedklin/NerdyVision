@@ -37,9 +37,9 @@ while 687:
     ret, frame = cap.read()
 
     cv2.line(frame, (FRAME_CX, int(0.25*FRAME_Y)),
-             (FRAME_CX, int(0.75*FRAME_Y)), (0, 0, 255), 3)
+             (FRAME_CX, int(0.75*FRAME_Y)), (255, 0, 0), 3)
     cv2.line(frame, (int(0.25*FRAME_X), FRAME_CY),
-             (int(0.75*FRAME_X), FRAME_CY), (0, 0, 255), 3)
+             (int(0.75*FRAME_X), FRAME_CY), (255, 0, 0), 3)
     cv2.imwrite("/tmp/stream/img.jpg", frame)
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
