@@ -1,7 +1,11 @@
 from threading import Thread
+
 import cv2
 
-"""USB camera stream class for optimized FPS"""
+from src import NerdyConstants
+
+"""USB camera stream class for optimized FPS modified by tedfoodlin"""
+__author__ = "pyimagesearch @http://www.pyimagesearch.com/"
 
 
 class WebcamVideoStream:
@@ -9,6 +13,11 @@ class WebcamVideoStream:
         # initialize the video camera stream and read the first frame
         # from the stream
         self.stream = cv2.VideoCapture(src)
+        # adjust camera settings
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+        self.stream.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+
         (self.grabbed, self.frame) = self.stream.read()
 
         # initialize the variable used to indicate if the thread should
