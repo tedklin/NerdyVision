@@ -13,7 +13,8 @@ __author__ = "tedfoodlin"
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
 
-cap = WebcamVideoStream(src=-1).start()
+#cap = WebcamVideoStream(src=-1).start()
+cap = cv2.VideoCapture(-1)
 
 
 def main():
