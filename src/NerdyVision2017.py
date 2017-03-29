@@ -13,11 +13,11 @@ __author__ = "tedfoodlin"
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
 
-#cap = WebcamVideoStream(src=-1).start()
-cap = cv2.VideoCapture(-1)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
-cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+cap = WebcamVideoStream(src=-1).start()
+#cap = cv2.VideoCapture(-1)
+#cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
+#cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+#cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
 
 
 def main():
@@ -29,8 +29,9 @@ def main():
     print("NetworkTables initialized")
 
     while 687:
-        #frame = cap.read()
-        ret, frame = cap.read()
+        frame = cap.read()
+        frame = cv2.resize(frame, (NerdyConstants.FRAME_X, NerdyConstants.FRAME_Y))
+        #ret, frame = cap.read()
         img = frame.copy()
 
         NerdyFunctions.draw_static(frame)
@@ -78,7 +79,9 @@ def main():
 
                 error = target_x - NerdyConstants.FRAME_CX
                 angle_to_turn = NerdyFunctions.calc_horiz_angle(error)
-                aligned = 1 > angle_to_turn > -1
+                print("ANGLE_TO_TURN: " + str(angle_to_turn))
+                aligned = NerdyFunctions.is_aligned(angle_to_turn)
+                print("IS_ALIGNED: " + str(aligned))
 
         NerdyFunctions.draw_static(res)
         cv2.imshow("NerdyVision", res)
