@@ -33,7 +33,7 @@ def main():
         aligned = False
 
         frame = cap.read()
-        frame = cv2.resize(frame, (NerdyConstants.FRAME_X, NerdyConstants.FRAME_Y))
+        frame = cv2.resize(frame, (NerdyConstants.FRAME_X, NerdyConstants.FRAME_Y), interpolation = cv2.INTER_AREA)
         #ret, frame = cap.read()
         img = frame.copy()
 
