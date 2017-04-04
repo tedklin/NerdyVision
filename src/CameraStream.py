@@ -1,26 +1,33 @@
 from threading import Thread
 import cv2
-import NerdyConstants
+import NerdyFunctions, NerdyConstants
 
 """USB camera stream class for optimized FPS modified by tedfoodlin"""
 __author__ = "pyimagesearch @http://www.pyimagesearch.com/"
 
 
-class WebcamVideoStream:
+class CameraStream:
     def __init__(self, src=-1):
-        # initialize the video camera stream and read the first frame
+        # initialize the video camera stream settings and read the first frame
         # from the stream
         self.stream = cv2.VideoCapture(src)
         self.stream.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+
         (self.grabbed, self.frame) = self.stream.read()
+        self.img = self.frame.copy()
 
         # initialize the variable used to indicate if the thread should
         # be stopped
         self.stopped = False
 
     def start(self):
-        # start the thread to read frames from the video stream
-        Thread(target=self.update, args=()).start()
+        thread = Thread(target=self.update, args=())
+        # make a daemon thread so it terminates when main program terminates
+        thread.daemon = True
+        # start thread
+        thread.start()
         return self
 
     def update(self):
@@ -32,6 +39,10 @@ class WebcamVideoStream:
 
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.stream.read()
+            self.img = self.frame.copy()
+            NerdyFunctions.draw_static(self.img)
+            cv2.imwrite("/tmp/stream/img.jpg", self.img)
+            cv2.imshow("stream", self.img)
 
     def read(self):
         # return the frame most recently read
