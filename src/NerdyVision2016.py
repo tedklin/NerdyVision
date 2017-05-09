@@ -17,7 +17,15 @@ if not os.path.isdir("/tmp/stream"):
 cap = cv2.VideoCapture(-1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
-cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
+cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)
+cap.set(cv2.CAP_PROP_CONTRAST, 1)
+cap.set(cv2.CAP_PROP_SATURATION, 1)
+
+os.system("v4l2-ctl -d /dev/video-1 -c exposure_auto=1, "
+          "exposure_absolute=5, "
+          "white_balance_temperature_auto=0, "
+          "white_balance_temperature=8000")
 
 
 def main():
@@ -39,7 +47,7 @@ def main():
         # dilation = cv2.dilate(erosion, kernel, iterations=1)
         res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
 
-        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+        _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)[-2]
 
         if len(cnts) > 0:

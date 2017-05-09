@@ -17,7 +17,15 @@ if not os.path.isdir("/tmp/stream"):
 cap = cv2.VideoCapture(-1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
-cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
+cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)
+cap.set(cv2.CAP_PROP_CONTRAST, 1)
+cap.set(cv2.CAP_PROP_SATURATION, 1)
+
+os.system("v4l2-ctl -d /dev/video-1 -c exposure_auto=1, "
+          "exposure_absolute=5, "
+          "white_balance_temperature_auto=0, "
+          "white_balance_temperature=8000")
 
 
 def main():
@@ -29,6 +37,9 @@ def main():
     print("NetworkTables initialized")
 
     while 687:
+        angle_to_turn = 0
+        aligned = False
+
         ret, frame = cap.read()
         blur = cv2.GaussianBlur(frame, (11, 11), 0)
         # kernel = np.ones((5, 5), np.uint8)

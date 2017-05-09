@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 import os
+import NerdyConstants
 
 """FRC Vision Target Calibration"""
 __author__ = "tedfoodlin"
@@ -30,9 +31,17 @@ CAL_L = FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_X)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_Y)
-cap.set(cv2.CAP_PROP_EXPOSURE, -8.0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
+cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)
+cap.set(cv2.CAP_PROP_CONTRAST, 1)
+cap.set(cv2.CAP_PROP_SATURATION, 1)
+
+os.system("v4l2-ctl -d /dev/video-1 -c exposure_auto=1, "
+          "exposure_absolute=5, "
+          "white_balance_temperature_auto=0, "
+          "white_balance_temperature=8000")
 
 def main():
     while 687:
