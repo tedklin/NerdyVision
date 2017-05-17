@@ -33,14 +33,19 @@ def main():
     NetworkTable.setIPAddress("roboRIO-687-FRC.local")
     NetworkTable.setClientMode()
     NetworkTable.initialize()
-    SmartDashboard = NetworkTable.getTable("NerdyVision")
+    table = NetworkTable.getTable("NerdyVision")
     print("NetworkTables initialized")
 
+    angle_to_turn = 0
+
     while 687:
-        angle_to_turn = 0
+
         aligned = False
+        previous_angle_to_turn = angle_to_turn
 
         ret, frame = cap.read()
+        timestamp = table.getNumber("CURRENT_TIME")
+
         blur = cv2.GaussianBlur(frame, (11, 11), 0)
         # kernel = np.ones((5, 5), np.uint8)
         # erosion = cv2.erode(frame, kernel, iterations=1)
@@ -90,8 +95,10 @@ def main():
         NerdyFunctions.draw_static(res)
         cv2.imshow("NerdyVision", res)
         try:
-            SmartDashboard.putNumber('ANGLE_TO_TURN', angle_to_turn)
-            SmartDashboard.putBoolean('IS_ALIGNED', aligned)
+            table.putBoolean('IS_ALIGNED', aligned)
+            if angle_to_turn != previous_angle_to_turn:
+                table.putNumber('ANGLE_TO_TURN', angle_to_turn)
+                table.putNumber('CAPTURE_TIME', timestamp)
         except:
             print("DATA NOT SENDING...")
 

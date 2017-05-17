@@ -13,21 +13,13 @@ if not os.path.isdir("/tmp/stream"):
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
 cap = cv2.VideoCapture(-1)
 
-# Dimensions in use (Microsoft Lifecam HD-3000)
-FRAME_X = 640
-FRAME_Y = 480
-FOV_ANGLE = 59.02039664
-DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
-FRAME_CX = int(FRAME_X/2)
-FRAME_CY = int(FRAME_Y/2)
-
 # Calibration box dimensions
 CAL_AREA = 1600
 CAL_SIZE = int(math.sqrt(CAL_AREA))
-CAL_UP = FRAME_CY + (CAL_SIZE / 2)
-CAL_LO = FRAME_CY - (CAL_SIZE / 2)
-CAL_R = FRAME_CX - (CAL_SIZE / 2)
-CAL_L = FRAME_CX + (CAL_SIZE / 2)
+CAL_UP = NerdyConstants.FRAME_CY + (CAL_SIZE / 2)
+CAL_LO = NerdyConstants.FRAME_CY - (CAL_SIZE / 2)
+CAL_R = NerdyConstants.FRAME_CX - (CAL_SIZE / 2)
+CAL_L = NerdyConstants.FRAME_CX + (CAL_SIZE / 2)
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
@@ -42,6 +34,7 @@ os.system("v4l2-ctl -d /dev/video-1 -c exposure_auto=1, "
           "exposure_absolute=5, "
           "white_balance_temperature_auto=0, "
           "white_balance_temperature=8000")
+
 
 def main():
     while 687:
