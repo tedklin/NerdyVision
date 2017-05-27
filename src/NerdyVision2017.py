@@ -63,20 +63,25 @@ def main():
                 c = cnts[i]
                 area = cv2.contourArea(c)
                 if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
-                    goal = NerdyFunctions.polygon(c, 0.02)
 
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    x, y, w, h = cv2.boundingRect(c)
+                    aspect_ratio = float(w) / h
+                    if (NerdyConstants.MIN_GEAR_ASPECT < aspect_ratio < NerdyConstants.MAX_GEAR_ASPECT):
 
-                    M = cv2.moments(goal)
-                    if M['m00'] > 0:
-                        cx = int(M['m10'] / M['m00'])
-                        cy = int(M['m01'] / M['m00'])
-                        center = (cx, cy)
+                        goal = NerdyFunctions.polygon(c, 0.02)
 
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
+                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                        centers_x.append(cx)
-                        centers_y.append(cy)
+                        M = cv2.moments(goal)
+                        if M['m00'] > 0:
+                            cx = int(M['m10'] / M['m00'])
+                            cy = int(M['m01'] / M['m00'])
+                            center = (cx, cy)
+
+                            cv2.circle(res, center, 5, (255, 0, 0), -1)
+
+                            centers_x.append(cx)
+                            centers_y.append(cy)
 
             if len(centers_x) == 3 and len(centers_y) == 3:
                 target_x = (centers_x[1] + centers_x[2])/2

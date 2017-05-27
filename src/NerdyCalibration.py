@@ -4,11 +4,8 @@ import math
 import os
 import NerdyConstants
 
-"""FRC Vision Target Calibration"""
+"""FRC Vision Target Calibration (Box)"""
 __author__ = "tedfoodlin"
-
-if not os.path.isdir("/tmp/stream"):
-   os.makedirs("/tmp/stream")
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
 cap = cv2.VideoCapture(-1)
