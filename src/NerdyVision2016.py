@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 import cv2
 import numpy as np
 from CameraStream import CameraStream
@@ -52,7 +53,7 @@ def main():
         previous_angle_to_turn = angle_to_turn
 
         ret, frame = cap.read()
-        timestamp = table.getNumber("CURRENT_TIME")
+        capture_time = time.time()
 
         # blur = cv2.GaussianBlur(frame, (11, 11), 0)
         kernel = np.ones((5, 5), np.uint8)
@@ -85,13 +86,20 @@ def main():
                         aligned = NerdyFunctions.is_aligned(angle_to_turn)
                         print("IS_ALIGNED: " + str(aligned))
 
+                        processed_time = time.time()
+                        delta_time = processed_time - capture_time
+                        print("PROCESSED_TIME: " + str(delta_time))
+
         NerdyFunctions.draw_static(res)
         cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
-            if angle_to_turn != previous_angle_to_turn:
+            if previous_angle_to_turn != angle_to_turn:
                 table.putNumber('ANGLE_TO_TURN', angle_to_turn)
-                table.putNumber('CAPTURE_TIME', timestamp)
+                table.putNumber('PROCESSED_TIME', delta_time)
+            else :
+                table.putNumber('ANGLE_TO_TURN', 0)
+                table.putNumber('PROCESSED_TIME', 0)
         except:
             print("DATA NOT SENDING...")
 
