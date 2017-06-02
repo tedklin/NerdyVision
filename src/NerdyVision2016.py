@@ -1,6 +1,7 @@
 import logging
 import os
 import cv2
+import numpy as np
 from CameraStream import CameraStream
 from networktables import NetworkTable
 import NerdyConstants
@@ -53,14 +54,14 @@ def main():
         ret, frame = cap.read()
         timestamp = table.getNumber("CURRENT_TIME")
 
-        blur = cv2.GaussianBlur(frame, (11, 11), 0)
-        # kernel = np.ones((5, 5), np.uint8)
-        # erosion = cv2.erode(frame, kernel, iterations=1)
-        # dilation = cv2.dilate(erosion, kernel, iterations=1)
-        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
+        # blur = cv2.GaussianBlur(frame, (11, 11), 0)
+        kernel = np.ones((5, 5), np.uint8)
+        erosion = cv2.erode(frame, kernel, iterations=1)
+        dilation = cv2.dilate(erosion, kernel, iterations=1)
+        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, dilation)
 
         _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                                cv2.CHAIN_APPROX_SIMPLE)[-2]
+                                cv2.CHAIN_APPROX_SIMPLE)
 
         if len(cnts) > 0:
             c = max(cnts, key=cv2.contourArea)

@@ -12,8 +12,8 @@ LOWER_GREEN = np.array([50, 50, 50])
 UPPER_GREEN = np.array([70, 250, 300])
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
-FRAME_X = 640
-FRAME_Y = 480
+FRAME_X = 320
+FRAME_Y = 240
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
 FRAME_CX = int(FRAME_X/2)
@@ -32,7 +32,7 @@ MIN_GEAR_ASPECT = 0.2
 MAX_GEAR_ASPECT = 0.6
 
 # High goal dimensions
-MIN_GOAL_AREA = 1500
+MIN_GOAL_AREA = 0
 
 # Boiler dimensions
 MIN_BOILER_AREA = 300

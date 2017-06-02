@@ -1,6 +1,7 @@
 import logging
 import os
 import cv2
+import numpy as np
 from CameraStream import CameraStream
 from networktables import NetworkTable
 import NerdyConstants
@@ -53,11 +54,11 @@ def main():
         ret, frame = cap.read()
         timestamp = table.getNumber("CURRENT_TIME")
 
-        blur = cv2.GaussianBlur(frame, (11, 11), 0)
-        # kernel = np.ones((5, 5), np.uint8)
-        # erosion = cv2.erode(frame, kernel, iterations=1)
-        # dilation = cv2.dilate(erosion, kernel, iterations=1)
-        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
+        # blur = cv2.GaussianBlur(frame, (11, 11), 0)
+        kernel = np.ones((5, 5), np.uint8)
+        erosion = cv2.erode(frame, kernel, iterations=1)
+        dilation = cv2.dilate(erosion, kernel, iterations=1)
+        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, dilation)
 
         _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center = None
@@ -69,26 +70,26 @@ def main():
             for i in range(len(cnts)):
                 c = cnts[i]
                 area = cv2.contourArea(c)
-                if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
+#                if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
 
-                    x, y, w, h = cv2.boundingRect(c)
-                    aspect_ratio = float(w) / h
-                    if (NerdyConstants.MIN_GEAR_ASPECT < aspect_ratio < NerdyConstants.MAX_GEAR_ASPECT):
+                x, y, w, h = cv2.boundingRect(c)
+                aspect_ratio = float(w) / h
+                if (NerdyConstants.MIN_GEAR_ASPECT < aspect_ratio < NerdyConstants.MAX_GEAR_ASPECT):
 
-                        goal = NerdyFunctions.polygon(c, 0.02)
+                    goal = NerdyFunctions.polygon(c, 0.02)
 
-                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
 
-                        M = cv2.moments(goal)
-                        if M['m00'] > 0:
-                            cx = int(M['m10'] / M['m00'])
-                            cy = int(M['m01'] / M['m00'])
-                            center = (cx, cy)
+                    M = cv2.moments(goal)
+                    if M['m00'] > 0:
+                        cx = int(M['m10'] / M['m00'])
+                        cy = int(M['m01'] / M['m00'])
+                        center = (cx, cy)
 
-                            cv2.circle(res, center, 5, (255, 0, 0), -1)
+                        cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                            centers_x.append(cx)
-                            centers_y.append(cy)
+                        centers_x.append(cx)
+                        centers_y.append(cy)
 
             if len(centers_x) == 3 and len(centers_y) == 3:
                 target_x = (centers_x[1] + centers_x[2])/2
