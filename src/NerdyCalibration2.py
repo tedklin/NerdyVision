@@ -39,10 +39,10 @@ def main():
     lower_h, lower_s, lower_v = 16, 67, 118
     upper_h, upper_s, upper_v = 33, 148, 254
 
-    cv2.createTrackbar('lower h', 'result', 0, 60, placeholder)
+    cv2.createTrackbar('lower h', 'result', 0, 179, placeholder)
     cv2.createTrackbar('lower s', 'result', 0, 255, placeholder)
     cv2.createTrackbar('lower v', 'result', 0, 255, placeholder)
-    cv2.createTrackbar('upper h', 'result', 0, 60, placeholder)
+    cv2.createTrackbar('upper h', 'result', 0, 179, placeholder)
     cv2.createTrackbar('upper s', 'result', 0, 255, placeholder)
     cv2.createTrackbar('upper v', 'result', 0, 255, placeholder)
 
