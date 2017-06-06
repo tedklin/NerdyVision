@@ -100,8 +100,13 @@ def main():
             else :
                 table.putNumber('ANGLE_TO_TURN', 0)
                 table.putNumber('PROCESSED_TIME', 0)
+            table.putBoolean('VISION_ON', True)
         except:
             print("DATA NOT SENDING...")
+            table.putBoolean('IS_ALINGED', False)
+            table.putNumber('ANGLE_TO_TURN', 0)
+            table.putNumber('PROCESSED_TIME', 0)
+            table.putBoolean('VISION_ON', False)
 
         cv2.waitKey(1)
 
