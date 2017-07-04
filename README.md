@@ -14,7 +14,7 @@ Raspberry Pi compatible USB camera (Microsoft Lifecam HD-3000 used in this proje
 
 [Food](https://www.google.com/#q=food)
 
-## Calibration Mode
+## Calibration Mode 1
 
 1. Set a small centered rectangle as the calibration box (can change the size in constants)
 
@@ -25,6 +25,18 @@ Raspberry Pi compatible USB camera (Microsoft Lifecam HD-3000 used in this proje
 4. Convert BGR value to HSV value
 
 5. Print HSV values for every frame
+
+## Calibration Mode 2
+
+1. Create adjustable trackbars for H, S, and V values
+
+2. Get HSV range from trackbars
+
+3. Capture frame from camera
+
+4. Apply HSV mask 
+
+5. Print HSV values in use
 
 ## Tracking Mode
 
