@@ -8,7 +8,7 @@ import NerdyConstants
 __author__ = "tedfoodlin"
 
 # Capture video from camera
-cap = cv2.VideoCapture(-1)
+cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
@@ -24,7 +24,7 @@ def main():
 
     # brightness adjusted, used to be 30, now is 70
     os.system("v4l2-ctl -d /dev/video0 "
-              "-c brightness=30 "
+              "-c brightness=70 "
               "-c contrast=10 "
               "-c saturation=100 "
               "-c white_balance_temperature_auto=0 "

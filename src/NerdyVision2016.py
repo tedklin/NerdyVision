@@ -26,7 +26,7 @@ def main():
 
     # brightness adjusted, used to be 30, now is 70
     os.system("v4l2-ctl -d /dev/video0 "
-              "-c brightness=30 "
+              "-c brightness=70 "
               "-c contrast=10 "
               "-c saturation=100 "
               "-c white_balance_temperature_auto=0 "
@@ -91,8 +91,9 @@ def main():
                         delta_time = processed_time - capture_time
                         print("PROCESSED_TIME: " + str(delta_time))
 
-        NerdyFunctions.draw_static(res)
-        cv2.imshow("NerdyVision", res)
+        # Has to be commented out because ssh doesn't allow opencv windows open
+        # NerdyFunctions.draw_static(res)
+        # cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
             if previous_angle_to_turn != angle_to_turn:
