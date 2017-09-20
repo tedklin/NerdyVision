@@ -10,7 +10,7 @@ import NerdyFunctions
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
@@ -46,12 +46,12 @@ def main():
     table = NetworkTable.getTable("NerdyVision")
     print("NetworkTables initialized")
 
-    angle_to_turn = 0
+    horizontal_angle = 0
 
     while 687:
 
         aligned = False
-        previous_angle_to_turn = angle_to_turn
+        previous_angle_to_turn = horizontal_angle
 
         ret, frame = cap.read()
         capture_time = time.time()
@@ -81,10 +81,13 @@ def main():
                         center = (cx, cy)
                         cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                        error = cx - NerdyConstants.FRAME_CX
-                        angle_to_turn = NerdyFunctions.calc_horiz_angle(error)
-                        print("ANGLE_TO_TURN: " + str(angle_to_turn))
-                        aligned = NerdyFunctions.is_aligned(angle_to_turn)
+                        error_x = cx - NerdyConstants.FRAME_CX
+                        error_y = cy - NerdyConstants.FRAME_CY
+                        horizontal_angle = NerdyFunctions.calc_horiz_angle(error_x)
+                        distance = NerdyFunctions.calc_distance(error_y)
+                        print("ANGLE_TO_TURN: " + str(horizontal_angle))
+                        print("DISTANCE_FROM_TARGET" + str(distance))
+                        aligned = NerdyFunctions.is_aligned(horizontal_angle)
                         print("IS_ALIGNED: " + str(aligned))
 
                         processed_time = time.time()
@@ -96,17 +99,20 @@ def main():
         # cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
-            if previous_angle_to_turn != angle_to_turn:
-                table.putNumber('ANGLE_TO_TURN', angle_to_turn)
+            if previous_angle_to_turn != horizontal_angle:
+                table.putNumber('ANGLE_TO_TURN', horizontal_angle)
+                table.putNumber('DISTANCE_FROM_TARGET', distance)
                 table.putNumber('PROCESSED_TIME', delta_time)
             else :
                 table.putNumber('ANGLE_TO_TURN', 0)
+                table.putNumber('DISTANCE_FROM_TARGET', 0)
                 table.putNumber('PROCESSED_TIME', 0)
             table.putBoolean('VISION_ON', True)
         except:
             print("DATA NOT SENDING...")
             table.putBoolean('IS_ALINGED', False)
             table.putNumber('ANGLE_TO_TURN', 0)
+            table.putNumber('DISTANCE_FROM_TARGET', 0)
             table.putNumber('PROCESSED_TIME', 0)
             table.putBoolean('VISION_ON', False)
 

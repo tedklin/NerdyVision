@@ -7,7 +7,7 @@ import NerdyFunctions
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Vision testing on laptop with Microsoft Lifecam"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 # Capture video from camera (0 for laptop webcam, 1 for USB camera)
 cap = cv2.VideoCapture(-1)

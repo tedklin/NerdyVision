@@ -5,7 +5,7 @@ import os
 import NerdyConstants
 
 """FRC Vision Target Calibration (Trackbar)"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 # Capture video from camera
 cap = cv2.VideoCapture(0)

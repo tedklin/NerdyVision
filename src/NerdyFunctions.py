@@ -1,8 +1,9 @@
 import cv2
 import NerdyConstants
+import math
 
 """FRC Image Processing Functions"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 
 def mask(lower, upper, frame):
@@ -38,9 +39,19 @@ def calc_center(M):
 
 def calc_horiz_angle(error):
     """Calculate the horizontal angle from pixel error."""
-    #return math.atan(error / NerdyConstants.FOCAL_LENGTH)
+    #return math.atan(error / NerdyConstants.FOCAL_LENGTH_X)
     return error * NerdyConstants.DEGREES_PER_PIXEL
 
+
+def calc_vertical_angle(error):
+    """Calculate the vertical angle from pixel error"""
+    #return math.atan(error / NerdyConstants.FOCAL_LENGTH_Y)
+    return (error * NerdyConstants.DEGREES_PER_PIXEL) + NerdyConstants.CAMERA_VERTICAL_ANGLE
+
+
+def calc_distance(error):
+    """Calculate the distance from target from pixel error"""
+    return NerdyConstants.TARGET_HEIGHT_DIFFERENCE / math.tan(calc_vertical_angle(error))
 
 def avg(x1, x2):
     """"Take average of 2 numbers."""

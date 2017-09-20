@@ -10,7 +10,7 @@ import NerdyFunctions
 logging.basicConfig(level=logging.DEBUG)
 
 """2017 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")

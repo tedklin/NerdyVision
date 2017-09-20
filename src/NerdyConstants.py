@@ -1,7 +1,7 @@
 import numpy as np
 
 """Important Constants"""
-__author__ = "tedfoodlin"
+__author__ = "tedlin"
 
 # HSV range values for testing sample images
 SAMPLE_LOWER = np.array([80, 70, 80])
@@ -18,6 +18,8 @@ FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
 FRAME_CX = int(FRAME_X/2)
 FRAME_CY = int(FRAME_Y/2)
+CAMERA_VERTICAL_ANGLE = 0 # the angle of camera from x plane
+TARGET_HEIGHT_DIFFERENCE = 0 # the difference in height (inches) between target and camera on robot
 
 # Mac webcam dimensions (approx)
 MAC_FRAME_X = 1280
