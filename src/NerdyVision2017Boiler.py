@@ -58,11 +58,11 @@ def main():
         ret, frame = cap.read()
         capture_time = time.time()
 
-        # blur = cv2.GaussianBlur(frame, (11, 11), 0)
-        kernel = np.ones((5, 5), np.uint8)
-        erosion = cv2.erode(frame, kernel, iterations=1)
-        dilation = cv2.dilate(erosion, kernel, iterations=1)
-        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, dilation)
+        blur = cv2.GaussianBlur(frame, (11, 11), 0)
+        # kernel = np.ones((5, 5), np.uint8)
+        # erosion = cv2.erode(frame, kernel, iterations=1)
+        # dilation = cv2.dilate(erosion, kernel, iterations=1)
+        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, blur)
 
         _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
@@ -71,7 +71,7 @@ def main():
             c = max(cnts, key=cv2.contourArea)
             area = cv2.contourArea(c)
 
-            if area > NerdyConstants.MIN_BOILER_AREA:
+            if area > NerdyConstants.MIN_BOILER_AREA and area < NerdyConstants.MAX_BOILER_AREA:
                 goal = NerdyFunctions.polygon(c, 0)
 
                 if len(goal) == 4:

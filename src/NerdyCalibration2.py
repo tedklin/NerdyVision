@@ -4,7 +4,7 @@ import math
 import os
 import NerdyConstants
 
-"""FRC Vision Target Calibration (Trackbar)"""
+"""FRC Vision Target HSV Color Calibration (Trackbars)"""
 __author__ = "tedlin"
 
 # Capture video from camera
@@ -70,8 +70,8 @@ def main():
             print("ERROR: make sure lower limit is lower than upper limit")
             cv2.imshow('NerdyCalibration', frame)
 
-        print("lower limit: " + str(lower_h) + ", " + str(lower_s) + ", " + str(lower_v))
-        print("upper limit: " + str(upper_h) + ", " + str(upper_s) + ", " + str(upper_v))
+        print("lower HSV limit: " + str(lower_h) + ", " + str(lower_s) + ", " + str(lower_v))
+        print("upper HSV limit: " + str(upper_h) + ", " + str(upper_s) + ", " + str(upper_v))
 
         cv2.waitKey(1)
 

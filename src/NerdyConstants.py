@@ -35,6 +35,8 @@ MAX_GEAR_ASPECT = 0.6
 
 # High goal dimensions
 MIN_GOAL_AREA = 0
+MAX_GOAL_AREA = 0
 
 # Boiler dimensions
 MIN_BOILER_AREA = 300
+MAX_BOILER_AREA = 100000

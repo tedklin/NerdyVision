@@ -4,7 +4,7 @@ import math
 import os
 import NerdyConstants
 
-"""FRC Vision Target Calibration (Box)"""
+"""FRC Vision Target HSV Color Calibration (Box)"""
 __author__ = "tedlin"
 
 # Capture video from camera
