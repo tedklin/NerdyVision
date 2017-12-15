@@ -47,6 +47,8 @@ def main():
     print("NetworkTables initialized")
 
     horizontal_angle = 0
+    distance = 0
+    target_area = 0
 
     while 687:
 
@@ -90,6 +92,9 @@ def main():
                         aligned = NerdyFunctions.is_aligned(horizontal_angle)
                         print("IS_ALIGNED: " + str(aligned))
 
+                        target_area = area
+                        print("TARGET_AREA: " + str(target_area))
+
                         processed_time = time.time()
                         delta_time = processed_time - capture_time
                         print("PROCESSED_TIME: " + str(delta_time))
@@ -101,10 +106,12 @@ def main():
             table.putBoolean('IS_ALIGNED', aligned)
             if previous_angle_to_turn != horizontal_angle:
                 table.putNumber('ANGLE_TO_TURN', horizontal_angle)
+                table.putNumber('TARGET_AREA', target_area)
                 table.putNumber('DISTANCE_FROM_TARGET', distance)
                 table.putNumber('PROCESSED_TIME', delta_time)
             else :
                 table.putNumber('ANGLE_TO_TURN', 0)
+                table.putNumber('TARGET_AREA', target_area)
                 table.putNumber('DISTANCE_FROM_TARGET', 0)
                 table.putNumber('PROCESSED_TIME', 0)
             table.putBoolean('VISION_ON', True)
@@ -112,6 +119,7 @@ def main():
             print("DATA NOT SENDING...")
             table.putBoolean('IS_ALINGED', False)
             table.putNumber('ANGLE_TO_TURN', 0)
+            table.putNumber('TARGET_AREA', target_area)
             table.putNumber('DISTANCE_FROM_TARGET', 0)
             table.putNumber('PROCESSED_TIME', 0)
             table.putBoolean('VISION_ON', False)
