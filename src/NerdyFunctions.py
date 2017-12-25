@@ -51,7 +51,10 @@ def calc_vertical_angle(error):
 
 def calc_distance(error):
     """Calculate the distance from target from pixel error"""
-    return NerdyConstants.TARGET_HEIGHT_DIFFERENCE / math.tan(math.radians(calc_vertical_angle(error)))
+    if error != 0:
+        return NerdyConstants.TARGET_HEIGHT_DIFFERENCE / math.tan(math.radians(calc_vertical_angle(error)))
+    else:
+        return 0
 
 
 def avg(x1, x2):

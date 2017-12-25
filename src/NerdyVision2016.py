@@ -92,8 +92,8 @@ def main():
                         print("PROCESSED_TIME: " + str(delta_time))
 
         # Has to be commented out because ssh doesn't allow opencv windows open
-        # NerdyFunctions.draw_static(res)
-        # cv2.imshow("NerdyVision", res)
+        NerdyFunctions.draw_static(res)
+        cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
             if previous_angle_to_turn != angle_to_turn:

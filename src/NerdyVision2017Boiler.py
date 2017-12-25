@@ -74,34 +74,33 @@ def main():
             if area > NerdyConstants.MIN_BOILER_AREA and area < NerdyConstants.MAX_BOILER_AREA:
                 goal = NerdyFunctions.polygon(c, 0)
 
-                if len(goal) == 4:
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
-                    M = cv2.moments(goal)
+                cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                M = cv2.moments(goal)
 
-                    if M['m00'] > 0:
-                        cx, cy = NerdyFunctions.calc_center(M)
-                        center = (cx, cy)
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
+                if M['m00'] > 0:
+                    cx, cy = NerdyFunctions.calc_center(M)
+                    center = (cx, cy)
+                    cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                        error_x = cx - NerdyConstants.FRAME_CX
-                        error_y = cy - NerdyConstants.FRAME_CY
-                        horizontal_angle = NerdyFunctions.calc_horiz_angle(error_x)
-                        distance = NerdyFunctions.calc_distance(error_y)
-                        print("ANGLE_TO_TURN: " + str(horizontal_angle))
-                        print("DISTANCE_FROM_TARGET" + str(distance))
-                        aligned = NerdyFunctions.is_aligned(horizontal_angle)
-                        print("IS_ALIGNED: " + str(aligned))
+                    error_x = cx - NerdyConstants.FRAME_CX
+                    error_y = cy - NerdyConstants.FRAME_CY
+                    horizontal_angle = NerdyFunctions.calc_horiz_angle(error_x)
+                    distance = NerdyFunctions.calc_distance(error_y)
+                    print("ANGLE_TO_TURN: " + str(horizontal_angle))
+                    print("DISTANCE_FROM_TARGET" + str(distance))
+                    aligned = NerdyFunctions.is_aligned(horizontal_angle)
+                    print("IS_ALIGNED: " + str(aligned))
 
-                        target_area = area
-                        print("TARGET_AREA: " + str(target_area))
+                    target_area = area
+                    print("TARGET_AREA: " + str(target_area))
 
-                        processed_time = time.time()
-                        delta_time = processed_time - capture_time
-                        print("PROCESSED_TIME: " + str(delta_time))
+                    processed_time = time.time()
+                    delta_time = processed_time - capture_time
+                    print("PROCESSED_TIME: " + str(delta_time))
 
         # Has to be commented out because ssh doesn't allow opencv windows open
-        # NerdyFunctions.draw_static(res)
-        # cv2.imshow("NerdyVision", res)
+        NerdyFunctions.draw_static(res)
+        cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
             if previous_angle_to_turn != horizontal_angle:
