@@ -60,15 +60,16 @@ def main():
         upper_s = cv2.getTrackbarPos('upper s', 'result')
         upper_v = cv2.getTrackbarPos('upper v', 'result')
 
-        if lower_h < upper_h & lower_s < upper_s & lower_v < upper_v:
+        if (lower_h < upper_h) & (lower_s < upper_s) & (lower_v < upper_v):
             lower_green = np.array([lower_h, lower_s, lower_v])
             upper_green = np.array([upper_h, upper_s, upper_v])
             mask = cv2.inRange(hsv, lower_green, upper_green)
             result = cv2.bitwise_and(frame, frame, mask=mask)
-            cv2.imshow('NerdyCalibration', result)
+            cv2.imshow('Filtered', result)
+            cv2.imshow('Raw', frame)
         else:
             print("ERROR: make sure lower limit is lower than upper limit")
-            cv2.imshow('NerdyCalibration', frame)
+            cv2.imshow('Raw', frame)
 
         print("lower HSV limit: " + str(lower_h) + ", " + str(lower_s) + ", " + str(lower_v))
         print("upper HSV limit: " + str(upper_h) + ", " + str(upper_s) + ", " + str(upper_v))

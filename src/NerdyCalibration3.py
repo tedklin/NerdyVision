@@ -14,7 +14,7 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
 
-cv2.namedWindow('result')
+cv2.namedWindow('params')
 
 
 def placeholder(x):
@@ -39,11 +39,10 @@ def main():
               "-c tilt_absolute=0 "
               "-c zoom_absolute=0")
 
-    max_area = NerdyConstants.FRAME_X * NerdyConstants.FRAME_Y
-    min_area = 0
     target_area = 0
-    cv2.createTrackbar('minimum target area', 'result', min_area, max_area, placeholder)
-    cv2.createTrackbar('maximum target area', 'result', min_area, max_area, placeholder)
+    # OpenCV trackbars can't be too large, so use sqrt(area) instead of area
+    cv2.createTrackbar('minimum target sqrt(area)', 'params', 0, 320, placeholder)
+    cv2.createTrackbar('maximum target sqrt(area)', 'params', 0, 320, placeholder)
 
     while 687:
         ret, frame = cap.read()
@@ -57,8 +56,8 @@ def main():
         _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
 
-        min_area = cv2.getTrackbarPos('minimum target area', 'result')
-        max_area = cv2.getTrackbarPos('maximum target area', 'result')
+        min_area = math.pow(cv2.getTrackbarPos('minimum target sqrt(area)', 'params'), 2)
+        max_area = math.pow(cv2.getTrackbarPos('maximum target sqrt(area)', 'params'), 2)
 
         if min_area < max_area:
             if len(cnts) > 0:
@@ -66,17 +65,17 @@ def main():
                 area = cv2.contourArea(c)
                 if area > min_area and area < max_area:
                     goal = NerdyFunctions.polygon(c, 0)
-                    if len(goal) == 4:
-                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
-                        M = cv2.moments(goal)
-                        target_area = area
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    M = cv2.moments(goal)
+                    target_area = area
+        else:
+            print("ERROR: make sure lower limit is lower than upper limit")
 
         print("min target area: " + str(min_area))
         print("max target area: " + str(max_area))
         print("target area: " + str(target_area))
 
-        cv2.imshow("NerdyVision", res)
-
+        cv2.imshow("Area Calibration", res)
         cv2.waitKey(1)
 
     cap.release()

@@ -8,8 +8,8 @@ SAMPLE_LOWER = np.array([80, 70, 80])
 SAMPLE_UPPER = np.array([100, 300, 300])
 
 # HSV range values for green
-LOWER_GREEN = np.array([50, 50, 50])
-UPPER_GREEN = np.array([70, 255, 255])
+LOWER_GREEN = np.array([50, 79, 50])
+UPPER_GREEN = np.array([75, 255, 255])
 
 # Dimensions in use (Microsoft Lifecam HD-3000)
 FRAME_X = 320
@@ -38,5 +38,5 @@ MIN_GOAL_AREA = 0
 MAX_GOAL_AREA = 0
 
 # Boiler dimensions
-MIN_BOILER_AREA = 300.0
-MAX_BOILER_AREA = 10000.0
+MIN_BOILER_AREA = 1936
+MAX_BOILER_AREA = 30000
