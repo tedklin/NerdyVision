@@ -4,7 +4,7 @@
 
 ## What You Need 
 
-Python 2.7, NumPy and OpenCV
+Python 2.x or 3.x, NumPy and OpenCV
 
 [PyNetworkTables](https://github.com/robotpy/pynetworktables)
 
@@ -16,19 +16,19 @@ Raspberry Pi compatible USB camera (Microsoft Lifecam HD-3000 used in this proje
 
 ## Calibration Mode 1
 
-1. Set a small centered rectangle as the calibration box (can change the size in constants)
+1. Set a small centered rectangle as the calibration box (can change the size)
 
-2. Get frame from camera
+2. Capture frame from camera
 
 3. Find average BGR value inside calibration box
 
 4. Convert BGR value to HSV value
 
-5. Print HSV values for every frame
+5. Print average HSV value inside calibration box
 
 ## Calibration Mode 2
 
-1. Create adjustable trackbars for H, S, and V values
+1. Create adjustable trackbars for minimum and maximum H, S, and V values
 
 2. Get HSV range from trackbars
 
@@ -38,21 +38,35 @@ Raspberry Pi compatible USB camera (Microsoft Lifecam HD-3000 used in this proje
 
 5. Print HSV values in use
 
+## Calibration Mode 3
+
+1. Create adjustable trackbars for minimum and maximum sqrt(area) values
+
+2. Get area values (square the values from trackbars)
+
+3. Capture frame from camera
+
+4. Apply HSV mask
+
+5. Find and draw contours within area constraints
+
+6. Print area values in use
+
 ## Tracking Mode
 
-1. Get frame from camera
+1. Capture frame from camera
 
 2. Remove everything but specified color in frame
 
-3. Find contour for the largest object with the specified color (closest goal)
+3. Find contour for largest object with the specified color within area constraints
 
 4. Find centroid of that object (ideal position to shoot / drop off gear)
 
-5. Calculate error and converts from pixels to degrees
+5. Calculate error (pixels) of centroid of object from center of frame
 
-6. If the center of the camera is aligned with the center x-axis of the object (goal), then it is ready to shoot
+6. Convert error in pixels to real world units
 
-7. Send data over NetworkTables and print in terminal.
+7. Send data over NetworkTables and print in terminal
 
 ## Testing
 
