@@ -1,6 +1,6 @@
 import numpy as np
 
-"""Important Constants"""
+"""Constants"""
 __author__ = "tedlin"
 
 # HSV range values for testing sample images
@@ -28,14 +28,14 @@ MAC_FOV_ANGLE = 60
 MAC_FOCAL_LENGTH = 15.118110236
 
 # Gear dimensions
-MIN_GEAR_AREA = 15000
-MAX_GEAR_AREA = 50000
+MIN_GEAR_AREA = 1936
+MAX_GEAR_AREA = 30000
 MIN_GEAR_ASPECT = 0.2
 MAX_GEAR_ASPECT = 0.6
 
 # High goal dimensions
-MIN_GOAL_AREA = 0
-MAX_GOAL_AREA = 0
+MIN_GOAL_AREA = 1936
+MAX_GOAL_AREA = 30000
 
 # Boiler dimensions
 MIN_BOILER_AREA = 1936

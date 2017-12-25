@@ -2,20 +2,17 @@ import logging
 import os
 import time
 import cv2
-import numpy as np
-from CameraStream import CameraStream
 from networktables import NetworkTable
 import NerdyConstants
 import NerdyFunctions
 logging.basicConfig(level=logging.DEBUG)
 
-"""2017 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
+"""2017 FRC Boiler Image Processing on Raspberry Pi with Microsoft Lifecam"""
 __author__ = "tedlin"
 
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
 
-#cap = CameraStream(src=-1).start()
 cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
@@ -99,8 +96,8 @@ def main():
                     print("PROCESSED_TIME: " + str(delta_time))
 
         # Has to be commented out because ssh doesn't allow opencv windows open
-        NerdyFunctions.draw_static(res)
-        cv2.imshow("NerdyVision", res)
+        # NerdyFunctions.draw_static(res)
+        # cv2.imshow("NerdyVision", res)
         try:
             table.putBoolean('IS_ALIGNED', aligned)
             if previous_angle_to_turn != horizontal_angle:

@@ -3,19 +3,17 @@ import os
 import time
 import cv2
 import numpy as np
-from CameraStream import CameraStream
 from networktables import NetworkTable
 import NerdyConstants
 import NerdyFunctions
 logging.basicConfig(level=logging.DEBUG)
 
-"""2017 FRC Vision Processing on Raspberry Pi with Microsoft Lifecam"""
+"""2017 FRC Gear Peg Image Processing on Raspberry Pi with Microsoft Lifecam"""
 __author__ = "tedlin"
 
 if not os.path.isdir("/tmp/stream"):
    os.makedirs("/tmp/stream")
 
-#cap = CameraStream(src=-1).start()
 cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
@@ -24,7 +22,6 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
 
 def main():
 
-    # brightness adjusted, used to be 30, now is 70
     os.system("v4l2-ctl -d /dev/video0 "
               "-c brightness=70 "
               "-c contrast=10 "
@@ -72,25 +69,25 @@ def main():
             for i in range(len(cnts)):
                 c = cnts[i]
                 area = cv2.contourArea(c)
-#                if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
 
-                x, y, w, h = cv2.boundingRect(c)
-                aspect_ratio = float(w) / h
-                if NerdyConstants.MIN_GEAR_ASPECT < aspect_ratio < NerdyConstants.MAX_GEAR_ASPECT:
+                if NerdyConstants.MIN_GEAR_AREA < area < NerdyConstants.MAX_GEAR_AREA:
+                    x, y, w, h = cv2.boundingRect(c)
+                    aspect_ratio = float(w) / h
 
-                    goal = NerdyFunctions.polygon(c, 0.02)
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    if NerdyConstants.MIN_GEAR_ASPECT < aspect_ratio < NerdyConstants.MAX_GEAR_ASPECT:
+                        goal = NerdyFunctions.polygon(c, 0.02)
+                        cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                        M = cv2.moments(goal)
 
-                    M = cv2.moments(goal)
-                    if M['m00'] > 0:
-                        cx = int(M['m10'] / M['m00'])
-                        cy = int(M['m01'] / M['m00'])
-                        center = (cx, cy)
+                        if M['m00'] > 0:
+                            cx = int(M['m10'] / M['m00'])
+                            cy = int(M['m01'] / M['m00'])
+                            center = (cx, cy)
 
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
+                            cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                        centers_x.append(cx)
-                        centers_y.append(cy)
+                            centers_x.append(cx)
+                            centers_y.append(cy)
 
             if len(centers_x) == 3 and len(centers_y) == 3:
                 target_x = (centers_x[1] + centers_x[2])/2
