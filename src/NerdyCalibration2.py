@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
 import NerdyConstants
 
 """FRC Vision Target HSV Color Calibration (Trackbars)"""
@@ -50,6 +53,15 @@ def main():
     while 687:
         ret, frame = cap.read()
 
+        fig = plt.figure(1)
+        fig2 = plt.figure(2)
+
+        # cv2.imshow('Raw', frame)
+        plot = fig.add_subplot(1, 1, 1)
+        plot.imshow(frame, animated=True)
+        animation.FuncAnimation(fig, frame, interval=0)
+        fig.show()
+
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         lower_h = cv2.getTrackbarPos('lower h', 'result')
@@ -64,11 +76,13 @@ def main():
             upper_green = np.array([upper_h, upper_s, upper_v])
             mask = cv2.inRange(hsv, lower_green, upper_green)
             result = cv2.bitwise_and(frame, frame, mask=mask)
-            cv2.imshow('Filtered', result)
-            cv2.imshow('Raw', frame)
+            # cv2.imshow('Filtered', result)
+            filtered = fig2.add_subplot(1, 1, 1)
+            filtered.imshow(result, animated=True)
+            animation.FuncAnimation(fig2, result, interval=0)
+            fig2.show()
         else:
             print("ERROR: make sure lower limit is lower than upper limit")
-            cv2.imshow('Raw', frame)
 
         print("lower HSV limit: " + str(lower_h) + ", " + str(lower_s) + ", " + str(lower_v))
         print("upper HSV limit: " + str(upper_h) + ", " + str(upper_s) + ", " + str(upper_v))

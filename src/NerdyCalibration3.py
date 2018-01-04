@@ -1,6 +1,9 @@
 import cv2
 import math
 import os
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
 import NerdyConstants
 import NerdyFunctions
 
@@ -74,7 +77,13 @@ def main():
         print("max target area: " + str(max_area))
         print("target area: " + str(target_area))
 
-        cv2.imshow("Area Calibration", res)
+        #cv2.imshow("Area Calibration", res)
+        fig = plt.figure(1)
+        plot = fig.add_subplot(1, 1, 1)
+        plot.imshow(res, animated=True)
+        animation.FuncAnimation(fig, res, interval=0)
+        fig.show()
+
         cv2.waitKey(1)
 
     cap.release()

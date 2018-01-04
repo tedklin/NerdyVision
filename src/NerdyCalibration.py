@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import math
 import os
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
 import NerdyConstants
 
 """FRC Vision Target HSV Color Calibration (Box)"""
@@ -13,10 +16,10 @@ cap = cv2.VideoCapture(0)
 # Calibration box dimensions
 CAL_AREA = 1600
 CAL_SIZE = int(math.sqrt(CAL_AREA))
-CAL_UP = NerdyConstants.FRAME_CY + (CAL_SIZE / 2)
-CAL_LO = NerdyConstants.FRAME_CY - (CAL_SIZE / 2)
-CAL_R = NerdyConstants.FRAME_CX - (CAL_SIZE / 2)
-CAL_L = NerdyConstants.FRAME_CX + (CAL_SIZE / 2)
+CAL_UP = int(NerdyConstants.FRAME_CY + (CAL_SIZE / 2))
+CAL_LO = int(NerdyConstants.FRAME_CY - (CAL_SIZE / 2))
+CAL_R = int(NerdyConstants.FRAME_CX - (CAL_SIZE / 2))
+CAL_L = int(NerdyConstants.FRAME_CX + (CAL_SIZE / 2))
 CAL_UL = (CAL_L, CAL_UP)
 CAL_LR = (CAL_R, CAL_LO)
 
@@ -53,7 +56,12 @@ def main():
         hsv = cv2.cvtColor(average_color, cv2.COLOR_BGR2HSV)
 
         print(np.array_str(hsv))
-        cv2.imshow("NerdyCalibration", frame)
+        # cv2.imshow("NerdyCalibration", frame)
+        fig = plt.figure(1)
+        plot = fig.add_subplot(1, 1, 1)
+        plot.imshow(frame, animated=True)
+        animation.FuncAnimation(fig, frame, interval=0)
+        plt.show()
         cv2.imwrite("/tmp/stream/img.jpg", frame)
 
         cv2.waitKey(1)
