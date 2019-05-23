@@ -3,18 +3,18 @@ import os
 import time
 import cv2
 import numpy as np
-from networktables import NetworkTable
+# from networktables import NetworkTable
 import NerdyConstants
 import NerdyFunctions
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 """2016 FRC High Goal Image Processing on Raspberry Pi with Microsoft Lifecam"""
 __author__ = "tedlin"
 
-if not os.path.isdir("/tmp/stream"):
-   os.makedirs("/tmp/stream")
+# if not os.path.isdir("/tmp/stream"):
+#    os.makedirs("/tmp/stream")
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
@@ -23,26 +23,26 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
 def main():
 
     # brightness adjusted, used to be 30, now is 70
-    os.system("v4l2-ctl -d /dev/video0 "
-              "-c brightness=70 "
-              "-c contrast=10 "
-              "-c saturation=100 "
-              "-c white_balance_temperature_auto=0 "
-              "-c power_line_frequency=2 "
-              "-c white_balance_temperature=4500 "
-              "-c sharpness=25 "
-              "-c backlight_compensation=0 "
-              "-c exposure_auto=1 "
-              "-c exposure_absolute=5 "
-              "-c pan_absolute=0 "
-              "-c tilt_absolute=0 "
-              "-c zoom_absolute=0")
+    # os.system("v4l2-ctl -d /dev/video0 "
+    #           "-c brightness=70 "
+    #           "-c contrast=10 "
+    #           "-c saturation=100 "
+    #           "-c white_balance_temperature_auto=0 "
+    #           "-c power_line_frequency=2 "
+    #           "-c white_balance_temperature=4500 "
+    #           "-c sharpness=25 "
+    #           "-c backlight_compensation=0 "
+    #           "-c exposure_auto=1 "
+    #           "-c exposure_absolute=5 "
+    #           "-c pan_absolute=0 "
+    #           "-c tilt_absolute=0 "
+    #           "-c zoom_absolute=0")
 
-    NetworkTable.setIPAddress("roboRIO-687-FRC.local")
-    NetworkTable.setClientMode()
-    NetworkTable.initialize()
-    table = NetworkTable.getTable("NerdyVision")
-    print("NetworkTables initialized")
+    # NetworkTable.setIPAddress("roboRIO-687-FRC.local")
+    # NetworkTable.setClientMode()
+    # NetworkTable.initialize()
+    # table = NetworkTable.getTable("NerdyVision")
+    # print("NetworkTables initialized")
 
     angle_to_turn = 0
 
@@ -91,22 +91,22 @@ def main():
 
         # Has to be commented out because ssh doesn't allow opencv windows open
         # NerdyFunctions.draw_static(res)
-        # cv2.imshow("NerdyVision", res)
-        try:
-            table.putBoolean('IS_ALIGNED', aligned)
-            if previous_angle_to_turn != angle_to_turn:
-                table.putNumber('ANGLE_TO_TURN', angle_to_turn)
-                table.putNumber('PROCESSED_TIME', delta_time)
-            else :
-                table.putNumber('ANGLE_TO_TURN', 0)
-                table.putNumber('PROCESSED_TIME', 0)
-            table.putBoolean('VISION_ON', True)
-        except:
-            print("DATA NOT SENDING...")
-            table.putBoolean('IS_ALINGED', False)
-            table.putNumber('ANGLE_TO_TURN', 0)
-            table.putNumber('PROCESSED_TIME', 0)
-            table.putBoolean('VISION_ON', False)
+        cv2.imshow("NerdyVision", res)
+        # try:
+        #     table.putBoolean('IS_ALIGNED', aligned)
+        #     if previous_angle_to_turn != angle_to_turn:
+        #         table.putNumber('ANGLE_TO_TURN', angle_to_turn)
+        #         table.putNumber('PROCESSED_TIME', delta_time)
+        #     else :
+        #         table.putNumber('ANGLE_TO_TURN', 0)
+        #         table.putNumber('PROCESSED_TIME', 0)
+        #     table.putBoolean('VISION_ON', True)
+        # except:
+        #     print("DATA NOT SENDING...")
+        #     table.putBoolean('IS_ALINGED', False)
+        #     table.putNumber('ANGLE_TO_TURN', 0)
+        #     table.putNumber('PROCESSED_TIME', 0)
+        #     table.putBoolean('VISION_ON', False)
 
         cv2.waitKey(1)
 
