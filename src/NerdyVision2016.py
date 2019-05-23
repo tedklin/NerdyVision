@@ -3,6 +3,7 @@ import os
 import time
 import cv2
 import numpy as np
+import math
 # from networktables import NetworkTable
 import NerdyConstants
 import NerdyFunctions
@@ -15,6 +16,35 @@ cap = cv2.VideoCapture(1)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, NerdyConstants.FRAME_Y)
+
+
+# checks if the contour is tilted to the right
+def get_orientation(contour_corners): 
+    # contour_ab = contour_corners[0][1] - contour_corners[1][1]
+    # contour_ad = contour_corners[0][1] - contour_corners[3][1]
+    
+    # # 1 is oriented left, 2 is right, 3 is vertical
+    # if(contour_ab < contour_ad):
+    #     return 1
+    # elif(contour_ab > contour_ad):
+    #     return 2
+    # elif(contour_corners[2][0] == contour_corners[1][0] or contour_corners[2][1] == contour_corners[2][1]):
+    #     return 3
+
+    dy_1 = contour_corners[0][1] - contour_corners[1][1]
+    dx_1 = contour_corners[0][0] - contour_corners[1][0]
+    hypo_1 = math.sqrt(math.pow(dy_1, 2) + math.pow(dx_1, 2))
+
+    dy_2 = contour_corners[1][1] - contour_corners[2][1]
+    dx_2 = contour_corners[1][0] - contour_corners[2][0]
+    hypo_2 = math.sqrt(math.pow(dy_2, 2) + math.pow(dx_2, 2))
+
+    if hypo_2 > hypo_1:
+        return 1
+    elif hypo_1 > hypo_2:
+        return 2
+    else:
+        return 3
 
 
 def main():
@@ -34,12 +64,6 @@ def main():
     #           "-c pan_absolute=0 "
     #           "-c tilt_absolute=0 "
     #           "-c zoom_absolute=0")
-
-    # NetworkTable.setIPAddress("roboRIO-687-FRC.local")
-    # NetworkTable.setClientMode()
-    # NetworkTable.initialize()
-    # table = NetworkTable.getTable("NerdyVision")
-    # print("NetworkTables initialized")
 
     angle_to_turn = 0
 
@@ -69,26 +93,48 @@ def main():
 
                 if len(goal) == 4:
                     rect = cv2.minAreaRect(goal)
-                    
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5) # remember to comment out
+                    box = cv2.boxPoints(rect)
+                    box = np.int0(box)
+
+                    orientation = get_orientation(box)
+                    print(orientation)
+                    if (orientation == 1):
+                        dy = abs(box[2][1] - box[1][1])
+                        dx = box[2][0] - box[1][0]
+                        angle = 90 - math.degrees(math.atan2(dy, dx))
+                        slope = dy / dx * 1.0
+                    elif (orientation == 2):
+                        dy = abs(box[1][1] - box[0][1])
+                        dx = box[1][0] - box[0][0]
+                        angle = 90 - math.degrees(math.atan2(dy, dx))
+                        slope = dy / dx * 1.0
+                    else:
+                        dy = 0
+                        dx = 1
+                        angle = 0
+                        slope = 99999
+                    print(dy)
+                    print(dx)
+                    print(angle)
+                    print(slope)
+                    print()
+
+                    # DISPLAY BLOCK REMEMBER TO COMMENT OUT
+                    # cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    cv2.drawContours(res,[box],0,(255,0,0),2)
+
                     M = cv2.moments(goal)
 
                     if M['m00'] > 0:
                         cx, cy = NerdyFunctions.calc_center(M)
                         center = (cx, cy)
-                        cv2.circle(res, center, 5, (255, 0, 0), -1)
 
-                        error = cx - NerdyConstants.FRAME_CX
-                        angle_to_turn = NerdyFunctions.calc_horiz_angle(error)
-                        print("ANGLE_TO_TURN: " + str(angle_to_turn))
-                        aligned = NerdyFunctions.is_aligned(angle_to_turn)
-                        print("IS_ALIGNED: " + str(aligned))
+                        # DISPLAY BLOCK REMEMBER TO COMMENT OUT
+                        cv2.circle(res, center, 5, (255, 0, 0), -1) # remember to comment out
+                        # print(center)
 
-                        processed_time = time.time()
-                        delta_time = processed_time - capture_time
-                        print("PROCESSED_TIME: " + str(delta_time))
 
-        # Has to be commented out because ssh doesn't allow opencv windows open
+        # DISPLAY BLOCK REMEMBER TO COMMENT OUT
         # NerdyFunctions.draw_static(res) # this just draws crosshairs
         cv2.imshow("NerdyVision", res)
 
