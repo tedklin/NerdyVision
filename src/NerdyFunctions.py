@@ -16,8 +16,8 @@ def mask(lower, upper, frame):
 
 def draw_static(img):
     """Draw references on frame."""
-    cv2.line(img, (NerdyConstants.FRAME_CX, int(0.25 * NerdyConstants.FRAME_Y)),
-             (NerdyConstants.FRAME_CX, int(0.75 * NerdyConstants.FRAME_Y)), (255, 0, 0), 3)
+    # cv2.line(img, (NerdyConstants.FRAME_CX, int(0.25 * NerdyConstants.FRAME_Y)),
+    #          (NerdyConstants.FRAME_CX, int(0.75 * NerdyConstants.FRAME_Y)), (255, 0, 0), 3)
     cv2.line(img, (int(0.25 * NerdyConstants.FRAME_X), NerdyConstants.FRAME_CY),
              (int(0.75 * NerdyConstants.FRAME_X), NerdyConstants.FRAME_CY), (255, 0, 0), 3)
 

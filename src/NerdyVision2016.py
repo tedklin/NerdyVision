@@ -92,50 +92,65 @@ def main():
                 goal = NerdyFunctions.polygon(c, 0.025)
 
                 if len(goal) == 4:
-                    rect = cv2.minAreaRect(goal)
-                    box = cv2.boxPoints(rect)
-                    box = np.int0(box)
-
-                    orientation = get_orientation(box)
-                    print(orientation)
-                    if (orientation == 1):
-                        dy = abs(box[2][1] - box[1][1])
-                        dx = box[2][0] - box[1][0]
-                        angle = 90 - math.degrees(math.atan2(dy, dx))
-                        slope = dy / dx * 1.0
-                    elif (orientation == 2):
-                        dy = abs(box[1][1] - box[0][1])
-                        dx = box[1][0] - box[0][0]
-                        angle = 90 - math.degrees(math.atan2(dy, dx))
-                        slope = dy / dx * 1.0
-                    else:
-                        dy = 0
-                        dx = 1
-                        angle = 0
-                        slope = 99999
-                    print(dy)
-                    print(dx)
-                    print(angle)
-                    print(slope)
-                    print()
-
-                    # DISPLAY BLOCK REMEMBER TO COMMENT OUT
-                    # cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
-                    cv2.drawContours(res,[box],0,(255,0,0),2)
-
                     M = cv2.moments(goal)
 
                     if M['m00'] > 0:
-                        cx, cy = NerdyFunctions.calc_center(M)
-                        center = (cx, cy)
-
+                        cv_cx, cv_cy = NerdyFunctions.calc_center(M)
+                        center = (cv_cx, cv_cy)
                         # DISPLAY BLOCK REMEMBER TO COMMENT OUT
                         cv2.circle(res, center, 5, (255, 0, 0), -1) # remember to comment out
-                        # print(center)
+                        
+                        real_cx = cv_cx - (NerdyConstants.FRAME_CX)
+                        real_cy = (NerdyConstants.FRAME_CY) - cv_cy
+                        center = (real_cx, real_cy)
+                        print(center)
+
+                        rect = cv2.minAreaRect(goal)
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+
+                        orientation = get_orientation(box)
+                        print(orientation)
+                        if (orientation == 1):
+                            dy = abs(box[2][1] - box[1][1])
+                            dx = box[2][0] - box[1][0]
+                            angle = 90 - math.degrees(math.atan2(dy, dx))
+                            slope = dy / dx * 1.0
+                            y_int = slope * -real_cx + real_cy
+                        elif (orientation == 2):
+                            dy = abs(box[1][1] - box[0][1])
+                            dx = box[1][0] - box[0][0]
+                            angle = 90 - math.degrees(math.atan2(dy, dx))
+                            slope = dy / dx * 1.0
+                            y_int = slope * -real_cx + real_cy
+                        else:
+                            dy = 0
+                            dx = 1
+                            angle = 0
+                            slope = 0
+                            y_int = 99999
+                        if math.isinf(y_int):
+                            y_int = 99999
+                        else:
+                            y_int = int(y_int)
+
+                        print(dy)
+                        print(dx)
+                        print(angle)
+                        print(slope)
+                        print(y_int)
+                        print()
+
+                        cv_y_int = (NerdyConstants.FRAME_CX, (NerdyConstants.FRAME_CY - y_int))
+                        cv2.circle(res, cv_y_int, 5, (0, 255, 0), -1) # remember to comment out
+
+                        # DISPLAY BLOCK REMEMBER TO COMMENT OUT
+                        # cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                        cv2.drawContours(res,[box],0,(255,0,0),2)
 
 
         # DISPLAY BLOCK REMEMBER TO COMMENT OUT
-        # NerdyFunctions.draw_static(res) # this just draws crosshairs
+        NerdyFunctions.draw_static(res) # this just draws crosshairs
         cv2.imshow("NerdyVision", res)
 
         cv2.waitKey(1)

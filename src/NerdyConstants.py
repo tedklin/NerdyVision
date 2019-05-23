@@ -20,8 +20,8 @@ FRAME_X = 320
 FRAME_Y = 240
 FOV_ANGLE = 59.02039664
 DEGREES_PER_PIXEL = FOV_ANGLE / FRAME_X
-FRAME_CX = int(FRAME_X/2)
-FRAME_CY = int(FRAME_Y/2)
+FRAME_CX = 160
+FRAME_CY = 120
 CAMERA_VERTICAL_ANGLE = 0 # the angle of camera from x plane
 TARGET_HEIGHT_DIFFERENCE = 0 # the difference in height (inches) between target and camera on robot
 
