@@ -11,9 +11,6 @@ import NerdyFunctions
 """2016 FRC High Goal Image Processing on Raspberry Pi with Microsoft Lifecam"""
 __author__ = "tedlin"
 
-# if not os.path.isdir("/tmp/stream"):
-#    os.makedirs("/tmp/stream")
-
 cap = cv2.VideoCapture(1)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, NerdyConstants.FRAME_X)
@@ -58,7 +55,7 @@ def main():
         kernel = np.ones((5, 5), np.uint8)
         erosion = cv2.erode(frame, kernel, iterations=1)
         dilation = cv2.dilate(erosion, kernel, iterations=1)
-        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_GREEN, NerdyConstants.UPPER_GREEN, dilation)
+        res, mask = NerdyFunctions.mask(NerdyConstants.LOWER_LIMIT, NerdyConstants.UPPER_LIMIT, dilation)
 
         _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
@@ -71,7 +68,9 @@ def main():
                 goal = NerdyFunctions.polygon(c, 0.025)
 
                 if len(goal) == 4:
-                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5)
+                    rect = cv2.minAreaRect(goal)
+                    
+                    cv2.drawContours(res, [goal], 0, (255, 0, 0), 5) # remember to comment out
                     M = cv2.moments(goal)
 
                     if M['m00'] > 0:
@@ -90,23 +89,8 @@ def main():
                         print("PROCESSED_TIME: " + str(delta_time))
 
         # Has to be commented out because ssh doesn't allow opencv windows open
-        # NerdyFunctions.draw_static(res)
+        # NerdyFunctions.draw_static(res) # this just draws crosshairs
         cv2.imshow("NerdyVision", res)
-        # try:
-        #     table.putBoolean('IS_ALIGNED', aligned)
-        #     if previous_angle_to_turn != angle_to_turn:
-        #         table.putNumber('ANGLE_TO_TURN', angle_to_turn)
-        #         table.putNumber('PROCESSED_TIME', delta_time)
-        #     else :
-        #         table.putNumber('ANGLE_TO_TURN', 0)
-        #         table.putNumber('PROCESSED_TIME', 0)
-        #     table.putBoolean('VISION_ON', True)
-        # except:
-        #     print("DATA NOT SENDING...")
-        #     table.putBoolean('IS_ALINGED', False)
-        #     table.putNumber('ANGLE_TO_TURN', 0)
-        #     table.putNumber('PROCESSED_TIME', 0)
-        #     table.putBoolean('VISION_ON', False)
 
         cv2.waitKey(1)
 

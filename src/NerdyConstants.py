@@ -7,11 +7,15 @@ __author__ = "tedlin"
 SAMPLE_LOWER = np.array([80, 70, 80])
 SAMPLE_UPPER = np.array([100, 300, 300])
 
-# HSV range values for green
-LOWER_GREEN = np.array([45, 79, 50])
-UPPER_GREEN = np.array([60, 255, 255])
+# red for real thing
+# LOWER_LIMIT = np.array([0, 79, 50])
+# UPPER_LIMIT = np.array([10, 255, 255])
 
-# Dimensions in use (Microsoft Lifecam HD-3000)
+# green for tests
+LOWER_LIMIT = np.array([60, 79, 50])
+UPPER_LIMIT = np.array([80, 255, 255])
+
+# Dimensions in use (some really sketch waterproof camera)
 FRAME_X = 320
 FRAME_Y = 240
 FOV_ANGLE = 59.02039664
@@ -27,16 +31,6 @@ MAC_FRAME_Y = 720
 MAC_FOV_ANGLE = 60
 MAC_FOCAL_LENGTH = 15.118110236
 
-# Gear dimensions
-MIN_GEAR_AREA = 1936
-MAX_GEAR_AREA = 30000
-MIN_GEAR_ASPECT = 0.2
-MAX_GEAR_ASPECT = 0.6
-
 # High goal dimensions
 MIN_GOAL_AREA = 1936
 MAX_GOAL_AREA = 30000
-
-# Boiler dimensions
-MIN_BOILER_AREA = 1936
-MAX_BOILER_AREA = 30000

@@ -62,7 +62,6 @@ def main():
         # plot.imshow(frame, animated=True)
         # animation.FuncAnimation(fig, frame, interval=0)
         # plt.show()
-        # cv2.imwrite("/tmp/stream/img.jpg", frame)
 
         cv2.waitKey(1)
 
